@@ -27,7 +27,7 @@ test('shows every pet returned by the API', async ({ page }) => {
   await expect(page.getByRole('status').filter({ hasText: 'Mostrando 3 mascotas' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Mora' })).toBeVisible()
   await expect(page.getByText('Criollo · 3 años · Hembra · Mediano')).toBeVisible()
-  await expect(page.getByText('En proceso de adopción')).toBeVisible()
+  await expect(page.getByTestId('pet-card').getByText('En proceso de adopción')).toBeVisible()
 })
 
 test('shows a loading message while the API answers', async ({ page }) => {
