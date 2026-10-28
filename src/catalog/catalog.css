@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #1c1917;
+  --muted: #44403c;
+  --accent: #c2410c;
+  --accent-strong: #9a3412;
+  --surface: #fffaf5;
+  --border: #d6d3d1;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+.catalog-container { width: min(72rem, 100% - 2rem); margin-inline: auto; }
+.catalog-header { background: #fff; border-bottom: 1px solid var(--border); }
+.brand { font-weight: 800; font-size: 1.25rem; color: var(--accent-strong); text-decoration: none; }
+nav a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+.eyebrow { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; color: var(--accent-strong); }
+
+.field { display: flex; flex-direction: column; gap: 0.25rem; }
+.field label { font-size: 0.875rem; font-weight: 600; }
+.field input, .field select {
+  border: 1px solid #78716c; border-radius: 0.75rem; background: #fff; padding: 0.6rem 0.8rem; font: inherit; color: var(--ink);
+}
+
+:where(a, button, input, select):focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
+
+.btn {
+  border: 0; border-radius: 999px; background: var(--accent-strong); color: #fff;
+  padding: 0.6rem 1.2rem; font-weight: 700; cursor: pointer;
+}
+.btn:hover { background: #7c2d12; }
+.btn-secondary { background: #fff; color: var(--accent-strong); border: 2px solid var(--accent-strong); }
+.btn-secondary:hover { background: #ffedd5; }
+
+.catalog-message { margin-top: 1.5rem; padding: 1.5rem; border: 1px dashed #78716c; border-radius: 1rem; background: #fff; text-align: center; }
+.catalog-error { border-style: solid; border-color: #b91c1c; color: #7f1d1d; background: #fef2f2; }
+.catalog-error .btn { margin-top: 0.75rem; }
+.catalog-message[hidden], [hidden] { display: none !important; }
+
+.spinner {
+  display: inline-block; width: 1rem; height: 1rem; margin-right: 0.5rem; vertical-align: -0.15rem;
+  border: 3px solid #d6d3d1; border-top-color: var(--accent-strong); border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
+.status-badge { background: #e7e5e4; color: #1c1917; }
+.status-badge[data-status="Disponible"] { background: #dcfce7; color: #14532d; }
+.status-badge[data-status="En proceso de adopcion"] { background: #fef3c7; color: #78350f; }
+.status-badge[data-status="Adoptado"] { background: #e0e7ff; color: #312e81; }

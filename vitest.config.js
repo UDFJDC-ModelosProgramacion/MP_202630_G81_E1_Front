@@ -5,7 +5,7 @@ export default defineConfig({
     include: ['tests/**/*.test.js'],
     coverage: {
       provider: 'v8',
-      include: ['src/adoption.js'],
+      include: ['src/adoption.js', 'src/catalog/catalog.js'],
       reporter: ['text', 'html'],
       thresholds: {
         statements: 100,

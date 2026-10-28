@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Conoce a las mascotas que esperan un hogar y filtra por especie o estado." />
+    <title>Catálogo de mascotas | AdoptaPet</title>
+  </head>
+  <body>
+    <header class="catalog-header">
+      <div class="catalog-container flex items-center justify-between py-4">
+        <a class="brand" href="/catalogo.html" aria-label="AdoptaPet, catálogo de mascotas"><span aria-hidden="true">🐾</span> AdoptaPet</a>
+        <nav aria-label="Navegación principal">
+          <a href="/catalogo.html" aria-current="page">Mascotas</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="catalog-container py-8">
+      <section aria-labelledby="catalog-title">
+        <p class="eyebrow">ELLAS Y ELLOS TE ESPERAN</p>
+        <h1 id="catalog-title" class="text-3xl font-extrabold text-stone-900 sm:text-4xl">Catálogo de mascotas</h1>
+        <p class="mt-2 max-w-2xl text-stone-700">Explora las mascotas registradas en los refugios y encuentra a tu próximo compañero.</p>
+
+        <form id="filters" class="filters mt-6 grid gap-4 sm:grid-cols-3" role="search" aria-label="Filtros del catálogo" novalidate>
+          <div class="field">
+            <label for="search">Buscar por nombre o raza</label>
+            <input id="search" name="search" type="search" autocomplete="off" placeholder="Ej. Mora, criollo" />
+          </div>
+          <div class="field">
+            <label for="species">Especie</label>
+            <select id="species" name="species"><option value="todos">Todas</option></select>
+          </div>
+          <div class="field">
+            <label for="status">Estado</label>
+            <select id="status" name="status">
+              <option value="todos">Todos</option>
+              <option value="Disponible">Disponible</option>
+              <option value="En proceso de adopcion">En proceso de adopción</option>
+              <option value="Adoptado">Adoptado</option>
+            </select>
+          </div>
+        </form>
+
+        <p id="results-summary" class="mt-4 text-sm text-stone-700" role="status" aria-live="polite"></p>
+
+        <div id="loading" class="catalog-message" role="status" hidden>
+          <span class="spinner" aria-hidden="true"></span> Cargando mascotas…
+        </div>
+
+        <div id="error" class="catalog-message catalog-error" role="alert" hidden>
+          <p id="error-text"></p>
+          <button id="retry" type="button" class="btn">Reintentar</button>
+        </div>
+
+        <div id="empty" class="catalog-message" hidden>
+          <p id="empty-text"></p>
+          <button id="clear-filters" type="button" class="btn btn-secondary" hidden>Limpiar filtros</button>
+        </div>
+
+        <ul id="pet-list" class="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-label="Lista de mascotas"></ul>
+      </section>
+    </main>
+
+    <script type="module" src="/src/catalog/catalog-main.js"></script>
+  </body>
+</html>
