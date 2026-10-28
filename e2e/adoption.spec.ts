@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/#solicitud')
 })
 
 test('shows validation feedback before accepting an incomplete request', async ({ page }) => {
@@ -73,4 +73,30 @@ test('opens the mobile navigation when requested', async ({ page }) => {
 
   await menu.click()
   await expect(menu).toHaveAttribute('aria-expanded', 'false')
+})
+
+test('shows the home page as the central navigation hub', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: /Una mirada puede cambiarlo todo/ })).toBeVisible()
+  await page.getByRole('link', { name: 'Ver galería de Mora' }).click()
+  await expect(page.getByRole('heading', { name: 'Mora' })).toBeVisible()
+})
+
+test('shows every photo and marks the main photo first', async ({ page }) => {
+  await page.goto('/#galeria/mora')
+
+  const photos = page.locator('.gallery-photo')
+  await expect(photos).toHaveCount(3)
+  await expect(photos.first()).toHaveClass(/gallery-photo-main/)
+  await expect(photos.first()).toContainText('Fotografía principal')
+})
+
+test('shows an informative empty state when the pet has no photos', async ({ page }) => {
+  await page.goto('/#galeria/luna')
+  await expect(page.getByRole('heading', { name: 'Aún no hay fotografías disponibles' })).toBeVisible()
+})
+
+test('shows an error when the requested pet does not exist', async ({ page }) => {
+  await page.goto('/#galeria/inexistente')
+  await expect(page.getByRole('alert')).toContainText('No encontramos a esta mascota')
 })
