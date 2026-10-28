@@ -17,6 +17,7 @@ app.innerHTML = `
     <nav class="header-nav" id="primary-navigation" aria-label="Navegación principal">
       <a href="#mascota">Mascotas</a>
       <a href="#proceso">Cómo funciona</a>
+      <a href="registro-adoptante.html">Registro</a>
       <a class="header-link" href="#solicitud">Mi solicitud <span aria-hidden="true">↗</span></a>
     </nav>
     <button class="menu-toggle" type="button" aria-label="Abrir navegación" aria-controls="primary-navigation" aria-expanded="false">
