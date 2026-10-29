@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/HU18.html#solicitud')
 })
 
 test('shows validation feedback before accepting an incomplete request', async ({ page }) => {
@@ -74,3 +74,11 @@ test('opens the mobile navigation when requested', async ({ page }) => {
   await menu.click()
   await expect(menu).toHaveAttribute('aria-expanded', 'false')
 })
+
+test('shows the home page as the central navigation hub', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: /Una mirada puede cambiarlo todo/ })).toBeVisible()
+  await page.getByRole('link', { name: 'Ver galería de Mora' }).click()
+  await expect(page.getByRole('heading', { name: 'Mora' })).toBeVisible()
+})
+
