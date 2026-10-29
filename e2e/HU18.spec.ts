@@ -82,21 +82,3 @@ test('shows the home page as the central navigation hub', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Mora' })).toBeVisible()
 })
 
-test('shows every photo and marks the main photo first', async ({ page }) => {
-  await page.goto('/#galeria/mora')
-
-  const photos = page.locator('.gallery-photo')
-  await expect(photos).toHaveCount(3)
-  await expect(photos.first()).toHaveClass(/gallery-photo-main/)
-  await expect(photos.first()).toContainText('Fotografía principal')
-})
-
-test('shows an informative empty state when the pet has no photos', async ({ page }) => {
-  await page.goto('/#galeria/luna')
-  await expect(page.getByRole('heading', { name: 'Aún no hay fotografías disponibles' })).toBeVisible()
-})
-
-test('shows an error when the requested pet does not exist', async ({ page }) => {
-  await page.goto('/#galeria/inexistente')
-  await expect(page.getByRole('alert')).toContainText('No encontramos a esta mascota')
-})

@@ -20,7 +20,7 @@ async function mockPets(page: Page, body: unknown, status = 200) {
 
 test('shows every pet returned by the API', async ({ page }) => {
   await mockPets(page, mascotas)
-  await page.goto('/catalogo.html')
+  await page.goto('/HU33.html')
 
   await expect(page.getByRole('heading', { name: 'Catálogo de mascotas', level: 1 })).toBeVisible()
   await expect(page.getByTestId('pet-card')).toHaveCount(3)
@@ -28,6 +28,7 @@ test('shows every pet returned by the API', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Mora' })).toBeVisible()
   await expect(page.getByText('Criollo · 3 años · Hembra · Mediano')).toBeVisible()
   await expect(page.getByTestId('pet-card').getByText('En proceso de adopción')).toBeVisible()
+  await expect(page.getByRole('complementary', { name: 'Información del catálogo' })).toBeVisible()
 })
 
 test('shows a loading message while the API answers', async ({ page }) => {
@@ -37,7 +38,7 @@ test('shows a loading message while the API answers', async ({ page }) => {
     await gate
     await route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '[]' })
   })
-  await page.goto('/catalogo.html')
+  await page.goto('/HU33.html')
 
   await expect(page.getByText('Cargando mascotas')).toBeVisible()
   release()
@@ -46,7 +47,7 @@ test('shows a loading message while the API answers', async ({ page }) => {
 
 test('filters by species, status and search text, and can clear the filters', async ({ page }) => {
   await mockPets(page, mascotas)
-  await page.goto('/catalogo.html')
+  await page.goto('/HU33.html')
   await expect(page.getByTestId('pet-card')).toHaveCount(3)
 
   await page.getByLabel('Especie').selectOption('Gato')
@@ -71,7 +72,7 @@ test('filters by species, status and search text, and can clear the filters', as
 
 test('shows an empty state when there are no pets', async ({ page }) => {
   await mockPets(page, [])
-  await page.goto('/catalogo.html')
+  await page.goto('/HU33.html')
 
   await expect(page.getByText('Aún no hay mascotas registradas. Vuelve pronto.')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Limpiar filtros' })).toBeHidden()
@@ -90,7 +91,7 @@ test('shows an error and lets the user retry', async ({ page }) => {
       body: ok ? JSON.stringify(mascotas) : '{}',
     })
   })
-  await page.goto('/catalogo.html')
+  await page.goto('/HU33.html')
 
   await expect(page.getByRole('alert')).toContainText('no pudo entregar el catálogo')
   await page.getByRole('button', { name: 'Reintentar' }).click()
@@ -100,14 +101,14 @@ test('shows an error and lets the user retry', async ({ page }) => {
 
 test('shows an error when the server cannot be reached', async ({ page }) => {
   await page.route(API, (route) => route.abort('connectionrefused'))
-  await page.goto('/catalogo.html')
+  await page.goto('/HU33.html')
 
   await expect(page.getByRole('alert')).toContainText('No pudimos conectar con el servidor')
 })
 
 test('can be used with the keyboard only', async ({ page }) => {
   await mockPets(page, mascotas)
-  await page.goto('/catalogo.html')
+  await page.goto('/HU33.html')
   await expect(page.getByTestId('pet-card')).toHaveCount(3)
 
   await page.getByLabel('Buscar por nombre o raza').focus()

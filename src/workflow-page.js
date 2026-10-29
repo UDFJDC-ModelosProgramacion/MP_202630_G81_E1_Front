@@ -1,13 +1,6 @@
 import './style.css'
-
-const navigation = `
-  <nav class="header-nav" id="primary-navigation" aria-label="Navegación principal">
-    <a href="./HU18.html">HU18 · Solicitud</a>
-    <a href="./HU19.html">HU19 · Adopción</a>
-    <a href="./HU20.html">HU20 · Convivencia</a>
-    <a href="./HU21.html">HU21 · Devolución</a>
-  </nav>
-`
+import { renderStoryLinks } from './story-navigation.js'
+import { renderStorySidebar } from './story-sidebar.js'
 
 export function mountWorkflowPage(config) {
   const app = document.querySelector('#app')
@@ -17,7 +10,9 @@ export function mountWorkflowPage(config) {
         <span class="brand-mark" aria-hidden="true">🐾</span>
         <span>huellitas<span class="brand-dot">.</span></span>
       </a>
-      ${navigation}
+      <nav class="header-nav" id="primary-navigation" aria-label="Navegación principal">
+        ${renderStoryLinks(config.storyId)}
+      </nav>
       <button class="menu-toggle" type="button" aria-label="Abrir navegación" aria-controls="primary-navigation" aria-expanded="false">
         <span></span><span></span>
       </button>
@@ -66,28 +61,7 @@ export function mountWorkflowPage(config) {
             <button id="new-record" class="secondary-button" type="button">Registrar otro</button>
           </section>
         </div>
-        <aside class="application-aside" aria-label="Información del proceso">
-          <div class="pet-card">
-            <div class="pet-photo workflow-photo">
-              <span class="photo-sun" aria-hidden="true"></span>
-              <span class="pet-badge"><span></span> ${config.petStatus}</span>
-              <span class="pet-emoji" role="img" aria-label="Ilustración de una mascota">${config.petEmoji}</span>
-            </div>
-            <div class="pet-details">
-              <div class="pet-title-row"><h2>${config.petTitle}</h2><span class="pet-age">${config.petTag}</span></div>
-              <p class="pet-breed">${config.petSubtitle}</p>
-              <p class="pet-location"><span aria-hidden="true">⌖</span> Refugio Huellitas · Bogotá</p>
-              <p class="pet-description">${config.asideDescription}</p>
-            </div>
-          </div>
-          <div class="process-card workflow-help">
-            <div class="process-icon" aria-hidden="true">✳</div>
-            <h3>${config.helpTitle}</h3>
-            <p>${config.helpDescription}</p>
-            <a href="./HU18.html">Volver a la solicitud de adopción <span aria-hidden="true">↗</span></a>
-          </div>
-          <p class="aside-note"><span aria-hidden="true">✦</span> ${config.asideNote}</p>
-        </aside>
+        ${renderStorySidebar(config)}
       </section>
     </main>
     <footer class="site-footer mx-auto flex items-center justify-between">

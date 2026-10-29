@@ -266,6 +266,49 @@ main,
   animation: view-arrive 420ms ease both;
 }
 
+.gallery-intro {
+  padding: 28px 0 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.gallery-intro h1 {
+  margin: 14px 0 8px;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.12;
+}
+
+.gallery-intro > p:last-child {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.gallery-pet-nav {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 16px 0 4px;
+}
+
+.gallery-pet-nav a {
+  display: flex;
+  min-width: 130px;
+  flex-direction: column;
+  gap: 3px;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.gallery-pet-nav a:hover { border-color: var(--green); }
+.gallery-pet-nav a span { color: var(--muted); font-size: 10px; font-weight: 500; }
+
 @keyframes view-arrive {
   from { opacity: 0; transform: translateY(9px); }
   to { opacity: 1; transform: translateY(0); }
@@ -578,6 +621,15 @@ main,
   align-items: start;
   gap: 34px;
 }
+
+.story-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 324px;
+  align-items: start;
+  gap: 34px;
+}
+
+.story-primary { min-width: 0; }
 
 .application-main {
   padding: 30px 35px 34px;
@@ -1419,6 +1471,11 @@ main,
     gap: 20px;
   }
 
+  .story-layout {
+    grid-template-columns: minmax(0, 1fr) 285px;
+    gap: 20px;
+  }
+
   .application-main {
     padding-inline: 23px;
   }
@@ -1558,8 +1615,15 @@ main,
     gap: 18px;
   }
 
+  .story-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
   .application-main,
-  .application-aside {
+  .application-aside,
+  .story-primary {
     width: 100%;
   }
 

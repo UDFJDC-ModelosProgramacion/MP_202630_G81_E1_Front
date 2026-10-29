@@ -1,11 +1,12 @@
 import '../style.css'
+import { renderStoryLinks } from '../story-navigation.js'
+import { renderStorySidebar } from '../story-sidebar.js'
 import {
   createApplication,
   getStoredApplications,
   saveApplication,
   validateApplication,
 } from '../workflows/HU18.js'
-import { getPetGallery, pets } from '../gallery.js'
 
 const app = document.querySelector('#app')
 
@@ -17,11 +18,9 @@ app.innerHTML = `
     </a>
     <nav class="header-nav" id="primary-navigation" aria-label="Navegación principal">
       <a href="#inicio">Inicio</a>
-      <a href="#galeria/mora">Galería</a>
+      <a href="./HU01.html#galeria/mora">Galería</a>
       <a class="header-link" href="#solicitud">Mi solicitud <span aria-hidden="true">↗</span></a>
-      <a href="./HU19.html">HU19 · Adopción</a>
-      <a href="./HU20.html">HU20 · Convivencia</a>
-      <a href="./HU21.html">HU21 · Devolución</a>
+      ${renderStoryLinks('HU18')}
     </nav>
     <button class="menu-toggle" type="button" aria-label="Abrir navegación" aria-controls="primary-navigation" aria-expanded="false">
       <span></span><span></span>
@@ -35,7 +34,7 @@ app.innerHTML = `
           <p class="eyebrow"><span class="eyebrow-dot"></span> REFUGIO HUELLITAS · BOGOTÁ</p>
           <h1>Una mirada puede <span>cambiarlo todo.</span></h1>
           <p>Conoce a quienes esperan un hogar. Mira sus historias, descubre sus personalidades y encuentra a tu nueva compañera de vida.</p>
-          <a class="home-primary-action" href="#galeria/mora">Conocer a Mora <span aria-hidden="true">→</span></a>
+          <a class="home-primary-action" href="./HU01.html#galeria/mora">Conocer a Mora <span aria-hidden="true">→</span></a>
         </div>
         <div class="home-hero-photo">
           <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&q=85" alt="Perrita de pelaje dorado mirando a la cámara">
@@ -44,18 +43,18 @@ app.innerHTML = `
       </div>
       <div class="home-section-heading">
         <div><p class="step-label">UN HOGAR LOS ESPERA</p><h2>Historias por conocer</h2></div>
-        <a href="#galeria/mora">Ver galería <span aria-hidden="true">↗</span></a>
+        <a href="./HU01.html#galeria/mora">Ver galería <span aria-hidden="true">↗</span></a>
       </div>
       <div class="home-pet-list">
         <article class="home-pet-row">
           <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=400&q=80" alt="Retrato de Mora">
           <div><span class="pet-status">EN ADOPCIÓN</span><h3>Mora</h3><p>Criolla · 2 años · Bogotá</p></div>
-          <a href="#galeria/mora" aria-label="Ver galería de Mora">Ver fotos <span aria-hidden="true">→</span></a>
+          <a href="./HU01.html#galeria/mora" aria-label="Ver galería de Mora">Ver fotos <span aria-hidden="true">→</span></a>
         </article>
         <article class="home-pet-row pet-without-photo">
           <div class="pet-initial" aria-hidden="true">L</div>
           <div><span class="pet-status">EN ADOPCIÓN</span><h3>Luna</h3><p>Criolla · 1 año · Bogotá</p></div>
-          <a href="#galeria/luna" aria-label="Ver galería de Luna">Ver fotos <span aria-hidden="true">→</span></a>
+          <a href="./HU01.html#galeria/luna" aria-label="Ver galería de Luna">Ver fotos <span aria-hidden="true">→</span></a>
         </article>
       </div>
       <section class="home-steps" id="proceso">
@@ -63,8 +62,6 @@ app.innerHTML = `
         <a href="#solicitud">Iniciar solicitud de adopción <span aria-hidden="true">→</span></a>
       </section>
     </section>
-
-    <section class="gallery-view" id="gallery-view" hidden aria-live="polite"></section>
 
     <div id="adoption-view" hidden>
     <section class="page-intro">
@@ -209,40 +206,24 @@ app.innerHTML = `
         </section>
       </div>
 
-      <aside class="application-aside" id="mascota" aria-label="Resumen de la mascota seleccionada">
-        <div class="pet-card">
-          <div class="pet-photo">
-            <span class="photo-sun" aria-hidden="true"></span>
-            <span class="pet-badge"><span></span> En adopción</span>
-            <span class="pet-emoji" role="img" aria-label="Ilustración de una perrita">🐕</span>
-            <span class="photo-heart" aria-hidden="true">♡</span>
-          </div>
-          <div class="pet-details">
-            <div class="pet-title-row"><h2>Mora</h2><span class="pet-age">2 años</span></div>
-            <p class="pet-breed">Criolla · Tamaño mediano</p>
-            <p class="pet-location"><span aria-hidden="true">⌖</span> Refugio Huellitas · Bogotá</p>
-            <div class="pet-tags"><span>Amorosa</span><span>Juguetona</span><span>Familiar</span></div>
-            <p class="pet-description">Una compañera dulce y curiosa que está lista para llenar tu hogar de alegría.</p>
-            <div class="pet-facts">
-              <div><span aria-hidden="true">♀</span><span>Hembra</span></div>
-              <div><span aria-hidden="true">♡</span><span>Vacunas al día</span></div>
-            </div>
-          </div>
-          <div class="pet-link">Mascota seleccionada <span aria-hidden="true">✓</span></div>
-        </div>
-
-        <div class="process-card" id="proceso">
-          <div class="process-icon" aria-hidden="true">✳</div>
-          <h3>¿Qué pasa después?</h3>
-          <ol>
-            <li><span>1</span><div><strong>Revisamos tu solicitud</strong><small>El refugio se pondrá en contacto contigo.</small></div></li>
-            <li><span>2</span><div><strong>Conversamos y nos conocemos</strong><small>Resolveremos tus dudas y coordinaremos una visita.</small></div></li>
-            <li><span>3</span><div><strong>Un nuevo hogar comienza</strong><small>Acompañamos cada paso de la adaptación.</small></div></li>
-          </ol>
-          <p class="help-note"><span aria-hidden="true">♡</span> ¿Tienes dudas? <a href="mailto:hola@huellitas.org">Escríbenos</a></p>
-        </div>
-        <p class="aside-note"><span aria-hidden="true">✦</span> Adoptar es un compromiso para toda la vida.</p>
-      </aside>
+      ${renderStorySidebar({
+        sidebarLabel: 'Resumen de la mascota seleccionada',
+        petStatus: 'En adopción',
+        petEmoji: '🐕',
+        petTitle: 'Mora',
+        petTag: '2 años',
+        petSubtitle: 'Criolla · Tamaño mediano',
+        asideDescription: 'Una compañera dulce y curiosa que está lista para llenar tu hogar de alegría.',
+        helpTitle: '¿Qué pasa después?',
+        helpDescription: 'El equipo de Huellitas te acompaña durante todo el proceso.',
+        helpSteps: [
+          ['Revisamos tu solicitud', 'El refugio se pondrá en contacto contigo.'],
+          ['Conversamos y nos conocemos', 'Resolveremos tus dudas y coordinaremos una visita.'],
+          ['Un nuevo hogar comienza', 'Acompañamos cada paso de la adaptación.'],
+        ],
+        helpLink: { href: 'mailto:hola@huellitas.org', label: '¿Tienes dudas? Escríbenos' },
+        asideNote: 'Adoptar es un compromiso para toda la vida.',
+      })}
     </section>
     </div>
   </main>
@@ -255,47 +236,12 @@ app.innerHTML = `
 `
 
 const homeView = document.querySelector('#home-view')
-const galleryView = document.querySelector('#gallery-view')
 const adoptionView = document.querySelector('#adoption-view')
-
-function renderGallery(petId) {
-  const gallery = getPetGallery(petId)
-  if (gallery.status === 'not-found') {
-    galleryView.innerHTML = `
-      <a class="gallery-back" href="#inicio">← Volver al inicio</a>
-      <div class="gallery-message" role="alert"><span aria-hidden="true">?</span><p class="step-label">MASCOTA NO ENCONTRADA</p><h1>No encontramos a esta mascota</h1><p>Puede que el enlace haya cambiado o que ya no esté disponible.</p><a class="home-primary-action" href="#inicio">Explorar mascotas</a></div>
-    `
-    return
-  }
-
-  if (gallery.status === 'empty') {
-    galleryView.innerHTML = `
-      <a class="gallery-back" href="#inicio">← Volver a mascotas</a>
-      <div class="gallery-heading"><p class="step-label">GALERÍA DE MASCOTA</p><h1>${gallery.pet.name}</h1><p>${gallery.pet.breed} · ${gallery.pet.age}</p></div>
-      <div class="gallery-message" role="status"><span aria-hidden="true">▧</span><h2>Aún no hay fotografías disponibles</h2><p>Estamos preparando las fotos de ${gallery.pet.name}. Vuelve pronto para conocerla mejor.</p></div>
-    `
-    return
-  }
-
-  galleryView.innerHTML = `
-    <a class="gallery-back" href="#inicio">← Volver a mascotas</a>
-    <div class="gallery-heading"><div><p class="step-label">GALERÍA DE MASCOTA</p><h1>${gallery.pet.name}<span class="gallery-count">${gallery.photos.length} fotografías</span></h1><p>${gallery.pet.breed} · ${gallery.pet.age} · ${gallery.pet.location}</p></div><a class="home-primary-action" href="#solicitud">Solicitar adopción <span aria-hidden="true">→</span></a></div>
-    <div class="photo-gallery">${gallery.photos.map((photo, index) => `
-      <figure class="gallery-photo ${photo.principal ? 'gallery-photo-main' : ''}">
-        <img src="${photo.src}" alt="${photo.alt}" loading="${index === 0 ? 'eager' : 'lazy'}">
-        ${photo.principal ? '<figcaption>Fotografía principal</figcaption>' : ''}
-      </figure>
-    `).join('')}</div>
-  `
-}
 
 function renderRoute() {
   const [route, petId] = window.location.hash.slice(1).split('/')
   homeView.hidden = route !== 'inicio' && route !== ''
-  galleryView.hidden = route !== 'galeria'
   adoptionView.hidden = route !== 'solicitud'
-
-  if (route === 'galeria') renderGallery(petId)
 }
 
 window.addEventListener('hashchange', renderRoute)
