@@ -1,11 +1,11 @@
-import './style.css'
+import '../style.css'
 import {
   createApplication,
   getStoredApplications,
   saveApplication,
   validateApplication,
-} from './adoption.js'
-import { getPetGallery, pets } from './gallery.js'
+} from '../workflows/HU18.js'
+import { getPetGallery, pets } from '../gallery.js'
 
 const app = document.querySelector('#app')
 
@@ -19,6 +19,9 @@ app.innerHTML = `
       <a href="#inicio">Inicio</a>
       <a href="#galeria/mora">Galería</a>
       <a class="header-link" href="#solicitud">Mi solicitud <span aria-hidden="true">↗</span></a>
+      <a href="./HU19.html">HU19 · Adopción</a>
+      <a href="./HU20.html">HU20 · Convivencia</a>
+      <a href="./HU21.html">HU21 · Devolución</a>
     </nav>
     <button class="menu-toggle" type="button" aria-label="Abrir navegación" aria-controls="primary-navigation" aria-expanded="false">
       <span></span><span></span>

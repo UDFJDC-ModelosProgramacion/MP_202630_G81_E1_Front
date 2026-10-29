@@ -1,6 +1,8 @@
 # Huellitas — solicitudes de adopción
 
-Interfaz frontend para la historia de usuario HU18. Permite a una persona interesada registrar una solicitud de adopción para Mora, iniciar el proceso de evaluación y recibir confirmación. Las solicitudes se guardan en el navegador con estado **Pendiente**; esta versión no se conecta a un backend. La prueba de convivencia pertenece a una historia de usuario diferente y no está incluida.
+Interfaz frontend para las historias HU18–HU21: solicitudes de adopción, formalización con asignación veterinaria, pruebas de convivencia con periodo definido, y devoluciones con actualización de disponibilidad e historial. Cada historia tiene una página separada y comparte el estilo visual de Huellitas.
+
+Los registros de estas historias se guardan en `localStorage` como demostración; no se conectan a un backend. El catálogo de mascotas HU33 conserva su integración existente con el API.
 
 ## Desarrollo
 
@@ -16,7 +18,7 @@ npm run test:unit
 npm run test:e2e
 ```
 
-Las pruebas unitarias, ubicadas en `tests/`, aplican umbrales del 100 % de sentencias, ramas, funciones y líneas al módulo de validación y persistencia. Las pruebas de Playwright recorren la validación, el envío y almacenamiento local de solicitudes y la navegación móvil.
+Las pruebas unitarias están separadas por historia (`tests/HU18.test.js` a `tests/HU21.test.js`) y también cubren HU33; Vitest exige 100 % de sentencias, ramas, funciones y líneas para los módulos de lógica. Las pruebas de navegador también están separadas por historia en `e2e/`.
 
 ## HU33 — Catálogo de mascotas
 
