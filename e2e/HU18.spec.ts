@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/#solicitud')
+  await page.goto('/HU18.html#solicitud')
 })
 
 test('shows validation feedback before accepting an incomplete request', async ({ page }) => {
