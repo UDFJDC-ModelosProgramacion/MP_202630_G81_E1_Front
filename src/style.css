@@ -1698,3 +1698,14 @@ main,
     transition-duration: 0.01ms !important;
   }
 }
+
+/* HU09 - Registro de adoptante */
+.registro-layout {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.registro-layout .secondary-button {
+  display: inline-block;
+  text-decoration: none;
+}

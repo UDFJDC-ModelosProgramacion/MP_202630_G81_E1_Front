@@ -52,3 +52,27 @@ Si el back corre en otra dirección, crear un archivo `.env.local` con `VITE_API
 npm run test:unit   # Vitest, cobertura 100 % de src/catalog/catalog.js
 npm run test:e2e    # Playwright, el API se simula con page.route (no necesita el back)
 ```
+
+## HU09 — Registrar adoptante
+
+Formulario para que una persona se registre como adoptante. Envía los datos (nombre, correo, teléfono, ciudad y dirección) al backend con `POST /api/adoptantes`, muestra los errores de validación del formulario y los que devuelve la API (por ejemplo, un correo ya registrado) y, al terminar, confirma el registro y guarda el número de adoptante en el navegador.
+
+### Cómo ejecutarla
+
+1. Levanta el backend (`MP_202630_G81_E1_Back`) en `http://localhost:8080`. La URL base de la API está en `src/adoptante.js` (`API_BASE_URL`).
+2. En este repositorio:
+
+```sh
+npm install
+npm run dev
+```
+
+3. Abre `http://localhost:5173/HU09.html` (también está el enlace «Registro» en la navegación de la página).
+
+### Pruebas
+
+```sh
+npm run test:unit
+```
+
+La lógica de HU09 está en `src/adoptante.js` y sus pruebas en `tests/adoptante.test.js` (cobertura del 100 %). La interfaz está en `registro-adoptante.html` y `src/registro-adoptante.js`.
