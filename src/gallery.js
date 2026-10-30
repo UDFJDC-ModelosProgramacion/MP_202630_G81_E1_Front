@@ -33,11 +33,21 @@ export const pets = [
   },
 ]
 
-export function getPetGallery(petId) {
+export function getPetGallery(petId, storage = null) {
   const pet = pets.find((candidate) => candidate.id === petId)
   if (!pet) return { status: 'not-found', pet: null, photos: [] }
-  if (pet.photos.length === 0) return { status: 'empty', pet, photos: [] }
 
-  const photos = [...pet.photos].sort((first, second) => Number(second.principal) - Number(first.principal))
+  let petPhotos = pet.photos
+  const saved = storage?.getItem('huellitas.photos')
+  if (saved !== null && saved !== undefined) {
+    const managedPhotos = JSON.parse(saved)
+    if (!Array.isArray(managedPhotos)) throw new TypeError('Las fotografías guardadas deben estar en una lista.')
+    petPhotos = managedPhotos
+      .filter((photo) => photo.petId === petId)
+      .map((photo) => ({ src: photo.url, alt: photo.description || `Fotografía de ${pet.name}`, principal: photo.principal }))
+  }
+  if (petPhotos.length === 0) return { status: 'empty', pet, photos: [] }
+
+  const photos = [...petPhotos].sort((first, second) => Number(second.principal) - Number(first.principal))
   return { status: 'available', pet, photos }
 }

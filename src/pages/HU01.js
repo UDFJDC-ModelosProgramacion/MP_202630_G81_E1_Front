@@ -56,7 +56,7 @@ app.innerHTML = `
 const galleryView = document.querySelector('#gallery-view')
 
 function renderGallery(petId) {
-  const gallery = getPetGallery(petId)
+  const gallery = getPetGallery(petId, window.localStorage)
   if (gallery.status === 'not-found') {
     galleryView.innerHTML = `
       <div class="gallery-message" role="alert"><span aria-hidden="true">?</span><p class="step-label">MASCOTA NO ENCONTRADA</p><h2>No encontramos a esta mascota</h2><p>Puede que el enlace haya cambiado o que ya no esté disponible.</p><a class="home-primary-action" href="./HU18.html">Explorar mascotas</a></div>
