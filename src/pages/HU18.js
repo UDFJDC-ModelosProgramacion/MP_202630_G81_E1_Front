@@ -1,24 +1,26 @@
-import './style.css'
+import '../style.css'
+import { renderStoryLinks } from '../story-navigation.js'
+import { renderStorySidebar } from '../story-sidebar.js'
 import {
   createApplication,
   getStoredApplications,
   saveApplication,
   validateApplication,
-} from './adoption.js'
+} from '../workflows/HU18.js'
 
 const app = document.querySelector('#app')
 
 app.innerHTML = `
   <header class="site-header mx-auto flex items-center justify-between">
-    <a class="brand" href="#" aria-label="Huellitas, inicio">
+    <a class="brand" href="#inicio" aria-label="Huellitas, inicio">
       <span class="brand-mark" aria-hidden="true">🐾</span>
       <span>huellitas<span class="brand-dot">.</span></span>
     </a>
     <nav class="header-nav" id="primary-navigation" aria-label="Navegación principal">
-      <a href="#mascota">Mascotas</a>
-      <a href="#proceso">Cómo funciona</a>
-      <a href="registro-adoptante.html">Registro</a>
+      <a href="#inicio">Inicio</a>
+      <a href="./HU01.html#galeria/mora">Galería</a>
       <a class="header-link" href="#solicitud">Mi solicitud <span aria-hidden="true">↗</span></a>
+      ${renderStoryLinks('HU18')}
     </nav>
     <button class="menu-toggle" type="button" aria-label="Abrir navegación" aria-controls="primary-navigation" aria-expanded="false">
       <span></span><span></span>
@@ -26,6 +28,42 @@ app.innerHTML = `
   </header>
 
   <main class="mx-auto w-full">
+    <section class="home-view" id="home-view">
+      <div class="home-hero">
+        <div class="home-copy">
+          <p class="eyebrow"><span class="eyebrow-dot"></span> REFUGIO HUELLITAS · BOGOTÁ</p>
+          <h1>Una mirada puede <span>cambiarlo todo.</span></h1>
+          <p>Conoce a quienes esperan un hogar. Mira sus historias, descubre sus personalidades y encuentra a tu nueva compañera de vida.</p>
+          <a class="home-primary-action" href="./HU01.html#galeria/mora">Conocer a Mora <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="home-hero-photo">
+          <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&q=85" alt="Perrita de pelaje dorado mirando a la cámara">
+          <span class="photo-caption"><span>EN ADOPCIÓN</span><strong>Mora, 2 años</strong></span>
+        </div>
+      </div>
+      <div class="home-section-heading">
+        <div><p class="step-label">UN HOGAR LOS ESPERA</p><h2>Historias por conocer</h2></div>
+        <a href="./HU01.html#galeria/mora">Ver galería <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="home-pet-list">
+        <article class="home-pet-row">
+          <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=400&q=80" alt="Retrato de Mora">
+          <div><span class="pet-status">EN ADOPCIÓN</span><h3>Mora</h3><p>Criolla · 2 años · Bogotá</p></div>
+          <a href="./HU01.html#galeria/mora" aria-label="Ver galería de Mora">Ver fotos <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="home-pet-row pet-without-photo">
+          <div class="pet-initial" aria-hidden="true">L</div>
+          <div><span class="pet-status">EN ADOPCIÓN</span><h3>Luna</h3><p>Criolla · 1 año · Bogotá</p></div>
+          <a href="./HU01.html#galeria/luna" aria-label="Ver galería de Luna">Ver fotos <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
+      <section class="home-steps" id="proceso">
+        <p class="step-label">UN PROCESO ACOMPAÑADO</p><h2>El primer paso empieza por conocerla.</h2>
+        <a href="#solicitud">Iniciar solicitud de adopción <span aria-hidden="true">→</span></a>
+      </section>
+    </section>
+
+    <div id="adoption-view" hidden>
     <section class="page-intro">
       <div class="intro-copy">
         <p class="eyebrow"><span class="eyebrow-dot"></span> UN NUEVO COMIENZO TE ESPERA</p>
@@ -168,49 +206,46 @@ app.innerHTML = `
         </section>
       </div>
 
-      <aside class="application-aside" id="mascota" aria-label="Resumen de la mascota seleccionada">
-        <div class="pet-card">
-          <div class="pet-photo">
-            <span class="photo-sun" aria-hidden="true"></span>
-            <span class="pet-badge"><span></span> En adopción</span>
-            <span class="pet-emoji" role="img" aria-label="Ilustración de una perrita">🐕</span>
-            <span class="photo-heart" aria-hidden="true">♡</span>
-          </div>
-          <div class="pet-details">
-            <div class="pet-title-row"><h2>Mora</h2><span class="pet-age">2 años</span></div>
-            <p class="pet-breed">Criolla · Tamaño mediano</p>
-            <p class="pet-location"><span aria-hidden="true">⌖</span> Refugio Huellitas · Bogotá</p>
-            <div class="pet-tags"><span>Amorosa</span><span>Juguetona</span><span>Familiar</span></div>
-            <p class="pet-description">Una compañera dulce y curiosa que está lista para llenar tu hogar de alegría.</p>
-            <div class="pet-facts">
-              <div><span aria-hidden="true">♀</span><span>Hembra</span></div>
-              <div><span aria-hidden="true">♡</span><span>Vacunas al día</span></div>
-            </div>
-          </div>
-          <div class="pet-link">Mascota seleccionada <span aria-hidden="true">✓</span></div>
-        </div>
-
-        <div class="process-card" id="proceso">
-          <div class="process-icon" aria-hidden="true">✳</div>
-          <h3>¿Qué pasa después?</h3>
-          <ol>
-            <li><span>1</span><div><strong>Revisamos tu solicitud</strong><small>El refugio se pondrá en contacto contigo.</small></div></li>
-            <li><span>2</span><div><strong>Conversamos y nos conocemos</strong><small>Resolveremos tus dudas y coordinaremos una visita.</small></div></li>
-            <li><span>3</span><div><strong>Un nuevo hogar comienza</strong><small>Acompañamos cada paso de la adaptación.</small></div></li>
-          </ol>
-          <p class="help-note"><span aria-hidden="true">♡</span> ¿Tienes dudas? <a href="mailto:hola@huellitas.org">Escríbenos</a></p>
-        </div>
-        <p class="aside-note"><span aria-hidden="true">✦</span> Adoptar es un compromiso para toda la vida.</p>
-      </aside>
+      ${renderStorySidebar({
+        sidebarLabel: 'Resumen de la mascota seleccionada',
+        petStatus: 'En adopción',
+        petEmoji: '🐕',
+        petTitle: 'Mora',
+        petTag: '2 años',
+        petSubtitle: 'Criolla · Tamaño mediano',
+        asideDescription: 'Una compañera dulce y curiosa que está lista para llenar tu hogar de alegría.',
+        helpTitle: '¿Qué pasa después?',
+        helpDescription: 'El equipo de Huellitas te acompaña durante todo el proceso.',
+        helpSteps: [
+          ['Revisamos tu solicitud', 'El refugio se pondrá en contacto contigo.'],
+          ['Conversamos y nos conocemos', 'Resolveremos tus dudas y coordinaremos una visita.'],
+          ['Un nuevo hogar comienza', 'Acompañamos cada paso de la adaptación.'],
+        ],
+        helpLink: { href: 'mailto:hola@huellitas.org', label: '¿Tienes dudas? Escríbenos' },
+        asideNote: 'Adoptar es un compromiso para toda la vida.',
+      })}
     </section>
+    </div>
   </main>
 
   <footer class="site-footer mx-auto flex items-center justify-between">
-    <a class="brand footer-brand" href="#"><span class="brand-mark" aria-hidden="true">🐾</span><span>huellitas<span class="brand-dot">.</span></span></a>
+    <a class="brand footer-brand" href="#inicio"><span class="brand-mark" aria-hidden="true">🐾</span><span>huellitas<span class="brand-dot">.</span></span></a>
     <p>Con amor, cada historia encuentra su hogar.</p>
     <span>© 2026 Huellitas</span>
   </footer>
 `
+
+const homeView = document.querySelector('#home-view')
+const adoptionView = document.querySelector('#adoption-view')
+
+function renderRoute() {
+  const [route, petId] = window.location.hash.slice(1).split('/')
+  homeView.hidden = route !== 'inicio' && route !== ''
+  adoptionView.hidden = route !== 'solicitud'
+}
+
+window.addEventListener('hashchange', renderRoute)
+renderRoute()
 
 const form = document.querySelector('#adoption-form')
 const formError = document.querySelector('#form-error')

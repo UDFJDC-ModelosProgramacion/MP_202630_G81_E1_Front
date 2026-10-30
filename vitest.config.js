@@ -1,3 +1,4 @@
+
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
@@ -5,7 +6,12 @@ export default defineConfig({
     include: ['tests/**/*.test.js'],
     coverage: {
       provider: 'v8',
-      include: ['src/adoption.js', 'src/adoptante.js'],
+      include: [
+        'src/workflows/HU*.js',
+        'src/workflows/storage.js',
+        'src/catalog/catalog.js',
+        'src/adoptante.js',
+      ],
       reporter: ['text', 'html'],
       thresholds: {
         statements: 100,

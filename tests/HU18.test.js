@@ -5,7 +5,7 @@ import {
   getStoredApplications,
   saveApplication,
   validateApplication,
-} from '../src/adoption.js'
+} from '../src/workflows/HU18.js'
 
 const validApplication = {
   fullName: ' Camila Rodríguez ',
