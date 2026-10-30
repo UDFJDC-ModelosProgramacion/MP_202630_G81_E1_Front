@@ -1,5 +1,9 @@
 const stories = [
   ['HU01', 'Galería de fotos'],
+  ['HU02', 'Gestionar fotografías'],
+  ['HU03', 'Eventos de vida'],
+  ['HU04', 'Línea de tiempo'],
+  ['HU05', 'Historias de éxito'],
   ['HU18', 'Solicitud de adopción'],
   ['HU19', 'Formalizar adopción'],
   ['HU20', 'Prueba de convivencia'],

@@ -16,7 +16,7 @@ export function renderStorySidebar(config) {
         <div class="pet-photo workflow-photo">
           <span class="photo-sun" aria-hidden="true"></span>
           <span class="pet-badge"><span></span> ${config.petStatus}</span>
-          <span class="pet-emoji" role="img" aria-label="Ilustración de una mascota">${config.petEmoji}</span>
+          <span class="pet-emoji" role="img" aria-label="Ilustración decorativa">${config.petEmoji}</span>
         </div>
         <div class="pet-details">
           <div class="pet-title-row"><h2>${config.petTitle}</h2><span class="pet-age">${config.petTag}</span></div>
