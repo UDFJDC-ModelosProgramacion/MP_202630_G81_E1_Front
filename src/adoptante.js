@@ -1,16 +1,9 @@
-import { apiRequest, withData } from '../api/client.js'
-
+export const API_BASE_URL = 'http://localhost:8080/api'
 export const ADOPTANTE_STORAGE_KEY = 'huellitas.adoptanteId'
+export const CONNECTION_ERROR = 'No pudimos conectarnos con el servidor. Inténtalo de nuevo en unos minutos.'
+export const UNEXPECTED_ERROR = 'No pudimos completar tu registro. Inténtalo de nuevo.'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-export const ADOPTANTE_ERROR_MESSAGES = {
-  nombre: 'Escribe tu nombre completo.',
-  email: 'Ingresa un correo electrónico válido.',
-  telefono: 'Ingresa un teléfono válido (mínimo 7 dígitos).',
-  ciudad: 'Indica la ciudad donde vives.',
-  direccion: 'Indica tu dirección.',
-}
 
 export function validateAdoptante(values) {
   const errors = {}
@@ -36,15 +29,37 @@ export function buildAdoptantePayload(values) {
   }
 }
 
-export async function registerAdoptante(payload, options) {
-  return withData(await apiRequest('/adoptantes', { ...options, method: 'POST', body: payload }), 'adoptante')
+async function readJson(response) {
+  try {
+    return await response.json()
+  } catch {
+    return {}
+  }
+}
+
+export async function registerAdoptante(payload, {
+  fetchFn = (...args) => globalThis.fetch(...args),
+  baseUrl = API_BASE_URL,
+} = {}) {
+  let response
+  try {
+    response = await fetchFn(`${baseUrl}/adoptantes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+  } catch {
+    return { ok: false, message: CONNECTION_ERROR }
+  }
+
+  const body = await readJson(response)
+  if (!response.ok) {
+    return { ok: false, message: body.apierror?.message ?? UNEXPECTED_ERROR }
+  }
+  return { ok: true, adoptante: body }
 }
 
 export function storeAdoptanteId(id, storage) {
   if (id === undefined || id === null) return
   storage.setItem(ADOPTANTE_STORAGE_KEY, String(id))
-}
-
-export function getStoredAdoptanteId(storage) {
-  return storage.getItem(ADOPTANTE_STORAGE_KEY)
 }

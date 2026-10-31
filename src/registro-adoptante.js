@@ -1,11 +1,10 @@
-import '../style.css'
+import './style.css'
 import {
   buildAdoptantePayload,
   registerAdoptante,
   storeAdoptanteId,
   validateAdoptante,
-  ADOPTANTE_ERROR_MESSAGES as errorMessages,
-} from '../workflows/HU09.js'
+} from './adoptante.js'
 
 const app = document.querySelector('#app')
 
@@ -103,6 +102,14 @@ const form = document.querySelector('#adoptante-form')
 const formError = document.querySelector('#form-error')
 const successView = document.querySelector('#success-view')
 const submitButton = document.querySelector('#submit-button')
+
+const errorMessages = {
+  nombre: 'Escribe tu nombre completo.',
+  email: 'Ingresa un correo electrónico válido.',
+  telefono: 'Ingresa un teléfono válido (mínimo 7 dígitos).',
+  ciudad: 'Indica la ciudad donde vives.',
+  direccion: 'Indica tu dirección.',
+}
 
 function clearErrors() {
   for (const name of Object.keys(errorMessages)) {

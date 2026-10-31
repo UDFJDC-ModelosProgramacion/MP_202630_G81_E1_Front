@@ -69,31 +69,26 @@ npm run test:unit   # Vitest, cobertura 100 % de src/catalog/catalog.js
 npm run test:e2e    # Playwright, el API se simula con page.route (no necesita el back)
 ```
 
-## HU09–HU17 — Adoptantes, vacunas y notificaciones
+## HU09 — Registrar adoptante
 
-Historias conectadas al back-end (`MP_202630_G81_E1_Back`). La URL base de la API se define en `src/api/client.js` (por defecto `http://localhost:8080/api`; se cambia con `VITE_API_URL` en `.env.local`). Cada historia usa su identificador en todos sus archivos: `HUxx.html`, `src/pages/HUxx.js`, `src/workflows/HUxx.js`, `tests/HUxx.test.js` y `e2e/HUxx.spec.ts`.
+Formulario para que una persona se registre como adoptante. Envía los datos (nombre, correo, teléfono, ciudad y dirección) al backend con `POST /api/adoptantes`, muestra los errores de validación del formulario y los que devuelve la API (por ejemplo, un correo ya registrado) y, al terminar, confirma el registro y guarda el número de adoptante en el navegador.
 
-| Historia | Página | Qué hace | Endpoints |
-| :--- | :--- | :--- | :--- |
-| HU09 | `HU09.html` | Registrar adoptante; guarda su id en el navegador | `POST /adoptantes` |
-| HU10 | `HU10.html` | Consultar y editar el perfil del adoptante registrado | `GET`/`PUT /adoptantes/{id}` |
-| HU11 | `HU11.html` | Listar adoptantes y ver el detalle | `GET /adoptantes`, `GET /adoptantes/{id}` |
-| HU12 | `HU12.html` | Consultar el catálogo de vacunas y su detalle | `GET /vacunas`, `GET /vacunas/{id}` |
-| HU13 | `HU13.html` | Crear, editar y eliminar vacunas (con confirmación) | `POST`/`PUT`/`DELETE /vacunas` |
-| HU14 | `HU14.html` | Registrar la vacunación de una mascota | `POST /registros-vacunacion` |
-| HU15 | `HU15.html` | Consultar el historial de vacunación de una mascota | `GET /registros-vacunacion` |
-| HU16 | `HU16.html` | Editar o eliminar un registro de vacunación | `PUT`/`DELETE /registros-vacunacion/{id}` |
-| HU17 | `HU17.html` | Consultar las notificaciones del adoptante | `GET /notificaciones/adoptante/{id}` |
+### Cómo ejecutarla
 
-### Cómo ejecutarlas
+1. Levanta el backend (`MP_202630_G81_E1_Back`) en `http://localhost:8080`. La URL base de la API está en `src/adoptante.js` (`API_BASE_URL`).
+2. En este repositorio:
 
-1. Levantar el back-end en `http://localhost:8080`.
-2. En este repo: `npm install` y `npm run dev`.
-3. Abrir `http://localhost:5173/HU09.html` y registrarse. HU10 y HU17 usan el id guardado por HU09; HU14 a HU16 necesitan que existan mascotas y vacunas (HU13).
+```sh
+npm install
+npm run dev
+```
+
+3. Abre `http://localhost:5173/HU09.html` (también está el enlace «Registro» en la navegación de la página).
 
 ### Pruebas
 
 ```sh
-npm run test:unit   # Vitest, cobertura 100 % de src/api/client.js y src/workflows/HU*.js
-npm run test:e2e    # Playwright, el API se simula con page.route (no necesita el back)
+npm run test:unit
 ```
+
+La lógica de HU09 está en `src/adoptante.js` y sus pruebas en `tests/adoptante.test.js` (cobertura del 100 %). La interfaz está en `registro-adoptante.html` y `src/registro-adoptante.js`.
