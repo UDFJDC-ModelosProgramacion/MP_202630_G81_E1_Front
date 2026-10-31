@@ -10,7 +10,7 @@ export default defineConfig({
         'src/workflows/HU*.js',
         'src/workflows/storage.js',
         'src/catalog/catalog.js',
-        'src/adoptante.js',
+        'src/api/client.js',
       ],
       reporter: ['text', 'html'],
       thresholds: {
