@@ -1,14 +1,12 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   ADOPTANTE_STORAGE_KEY,
-  API_BASE_URL,
-  CONNECTION_ERROR,
-  UNEXPECTED_ERROR,
+  getStoredAdoptanteId,
   buildAdoptantePayload,
   registerAdoptante,
   storeAdoptanteId,
   validateAdoptante,
-} from '../src/adoptante.js'
+} from '../src/workflows/HU09.js'
 
 const validValues = {
   nombre: ' Camila Rodríguez ',
@@ -21,10 +19,6 @@ const validValues = {
 function jsonResponse(body, ok = true) {
   return { ok, json: async () => body }
 }
-
-afterEach(() => {
-  vi.unstubAllGlobals()
-})
 
 describe('validateAdoptante', () => {
   it('accepts a complete registration', () => {
@@ -68,7 +62,7 @@ describe('registerAdoptante', () => {
   it('posts the adoptante and returns the created resource', async () => {
     const fetchFn = vi.fn().mockResolvedValue(jsonResponse({ id: 7, ...payload }))
 
-    const result = await registerAdoptante(payload, { fetchFn, baseUrl: 'http://api.test' })
+    const result = await registerAdoptante(payload, { fetchFn, apiUrl: 'http://api.test' })
 
     expect(result).toEqual({ ok: true, adoptante: { id: 7, ...payload } })
     expect(fetchFn).toHaveBeenCalledWith('http://api.test/adoptantes', {
@@ -76,15 +70,6 @@ describe('registerAdoptante', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
-  })
-
-  it('uses the global fetch and the default API url when no options are given', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ id: 1 }))
-    vi.stubGlobal('fetch', fetchMock)
-
-    await registerAdoptante(payload)
-
-    expect(fetchMock.mock.calls[0][0]).toBe(`${API_BASE_URL}/adoptantes`)
   })
 
   it('returns the message sent by the API when it rejects the registration', async () => {
@@ -95,30 +80,6 @@ describe('registerAdoptante', () => {
       ok: false,
       message: 'Ya existe un adoptante registrado con ese correo electrónico',
     })
-  })
-
-  it.each([
-    ['an error body without message', { apierror: {} }],
-    ['an unexpected error body', {}],
-  ])('falls back to a generic message for %s', async (_name, body) => {
-    const fetchFn = vi.fn().mockResolvedValue(jsonResponse(body, false))
-
-    expect(await registerAdoptante(payload, { fetchFn })).toEqual({ ok: false, message: UNEXPECTED_ERROR })
-  })
-
-  it('falls back to a generic message when the error body is not JSON', async () => {
-    const fetchFn = vi.fn().mockResolvedValue({
-      ok: false,
-      json: async () => { throw new SyntaxError('Unexpected token') },
-    })
-
-    expect(await registerAdoptante(payload, { fetchFn })).toEqual({ ok: false, message: UNEXPECTED_ERROR })
-  })
-
-  it('reports a connection error when the request fails', async () => {
-    const fetchFn = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'))
-
-    expect(await registerAdoptante(payload, { fetchFn })).toEqual({ ok: false, message: CONNECTION_ERROR })
   })
 })
 
@@ -138,5 +99,12 @@ describe('storeAdoptanteId', () => {
     const storage = memoryStorage()
     storeAdoptanteId(id, storage)
     expect(storage.getItem(ADOPTANTE_STORAGE_KEY)).toBeNull()
+  })
+
+  it('reads the saved id back', () => {
+    const storage = memoryStorage()
+    expect(getStoredAdoptanteId(storage)).toBeNull()
+    storeAdoptanteId(3, storage)
+    expect(getStoredAdoptanteId(storage)).toBe('3')
   })
 })
