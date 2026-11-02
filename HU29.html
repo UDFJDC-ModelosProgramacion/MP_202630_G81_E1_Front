@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HU29 - Historial médico</title>
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Historial médico de mascotas</h1>
+      <p>Consulta los eventos médicos registrados para conocer el estado de salud de una mascota.</p>
+    </header>
+
+    <section class="panel">
+      <h2>Consultar historial</h2>
+
+      <p id="feedback" role="status" aria-live="polite"></p>
+
+      <label for="pet">Seleccionar mascota</label>
+      <select id="pet">
+        <option value="">Seleccione una mascota</option>
+      </select>
+
+      <label for="diagnosis-filter">Filtrar por diagnóstico</label>
+      <input
+        type="search"
+        id="diagnosis-filter"
+        placeholder="Escriba un diagnóstico..."
+      >
+
+      <button type="button" id="search-button">
+        Consultar historial
+      </button>
+
+      <button type="button" id="clear-filter" class="secondary">
+        Limpiar filtro
+      </button>
+    </section>
+
+    <section class="panel">
+      <h2>Eventos médicos</h2>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Descripción</th>
+              <th>Diagnóstico</th>
+              <th>Tratamiento</th>
+            </tr>
+          </thead>
+          <tbody id="events-list">
+            <tr>
+              <td colspan="5">Seleccione una mascota para consultar su historial.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Consultar evento médico por ID</h2>
+
+      <label for="event-id">ID del evento médico</label>
+      <input
+        type="number"
+        id="event-id"
+        min="1"
+        placeholder="Ingrese el ID del evento"
+      >
+
+      <button type="button" id="search-event-button">
+        Buscar evento
+      </button>
+
+      <div id="event-detail" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script type="module" src="./src/pages/HU29.js"></script>
+</body>
+</html>
