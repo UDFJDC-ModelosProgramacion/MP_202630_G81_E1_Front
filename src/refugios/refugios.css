@@ -1,0 +1,11 @@
+/* HU30 - extras for the shelter form. Base styles come from ../catalog/catalog.css */
+.field textarea {
+  border: 1px solid #78716c; border-radius: 0.75rem; background: #fff; padding: 0.6rem 0.8rem;
+  font: inherit; color: var(--ink); min-height: 6rem; resize: vertical;
+}
+:where(textarea):focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
+.field [aria-invalid="true"] { border-color: #b91c1c; border-width: 2px; }
+.field-error { min-height: 1.25rem; font-size: 0.875rem; font-weight: 600; color: #991b1b; }
+.catalog-success { border-style: solid; border-color: #15803d; color: #14532d; background: #f0fdf4; }
+.form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }

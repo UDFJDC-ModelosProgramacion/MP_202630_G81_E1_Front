@@ -1,8 +1,5 @@
 // HU33 - Pet catalog: wires the DOM to the logic in catalog.js.
-import '../style.css'
 import './catalog.css'
-import { renderStoryLinks } from '../story-navigation.js'
-import { renderStorySidebar } from '../story-sidebar.js'
 import {
   ALL_FILTER,
   describeResults,
@@ -15,8 +12,6 @@ import {
 
 const $ = (selector) => document.querySelector(selector)
 const elements = {
-  storyNavigation: $('#story-navigation'),
-  storySidebar: $('#story-sidebar'),
   filters: $('#filters'),
   search: $('#search'),
   species: $('#species'),
@@ -33,21 +28,6 @@ const elements = {
 }
 
 let allPets = []
-
-elements.storyNavigation.innerHTML = renderStoryLinks('HU33')
-elements.storySidebar.innerHTML = renderStorySidebar({
-  sidebarLabel: 'Información del catálogo',
-  petStatus: 'API de refugios',
-  petEmoji: '🐾',
-  petTitle: 'Catálogo abierto',
-  petTag: 'HU33',
-  petSubtitle: 'Mascotas de refugios',
-  asideDescription: 'Consulta las mascotas registradas y conoce su especie, edad, estado y refugio.',
-  helpTitle: 'Encuentra una compañera',
-  helpDescription: 'Combina los filtros de especie, estado o nombre para explorar las opciones disponibles.',
-  helpLink: { href: './HU01.html', label: 'Ver galería de fotos' },
-  asideNote: 'La disponibilidad depende de los registros del refugio.',
-})
 
 function showOnly(section) {
   elements.loading.hidden = section !== 'loading'
@@ -82,7 +62,7 @@ function render() {
   elements.summary.textContent = describeResults(shown.length, allPets.length)
 
   if (allPets.length === 0) {
-    elements.emptyText.textContent = 'Aún no hay mascotas registradas. Vuelve pronto.'
+    elements.emptyText.textContent = 'No hay mascotas disponibles por el momento. Vuelve pronto.'
     elements.clear.hidden = true
     showOnly('empty')
     return

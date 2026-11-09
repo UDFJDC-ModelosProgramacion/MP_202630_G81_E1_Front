@@ -21,8 +21,6 @@ body {
 .catalog-header { background: #fff; border-bottom: 1px solid var(--border); }
 .brand { font-weight: 800; font-size: 1.25rem; color: var(--accent-strong); text-decoration: none; }
 nav a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
-.story-navigation { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; }
-.story-navigation a[aria-current="page"] { color: var(--accent-strong); }
 .eyebrow { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; color: var(--accent-strong); }
 
 .field { display: flex; flex-direction: column; gap: 0.25rem; }
@@ -57,3 +55,8 @@ nav a { color: var(--ink); font-weight: 600; text-decoration: underline; text-un
 .status-badge[data-status="Disponible"] { background: #dcfce7; color: #14532d; }
 .status-badge[data-status="En proceso de adopcion"] { background: #fef3c7; color: #78350f; }
 .status-badge[data-status="Adoptado"] { background: #e0e7ff; color: #312e81; }
+
+.detail-row { display: flex; flex-direction: column; }
+.detail-row dt { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.detail-row dd { margin: 0; font-size: 1rem; color: var(--ink); }
+.back-link { color: var(--accent-strong); font-weight: 600; }
