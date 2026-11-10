@@ -12,7 +12,7 @@ export default defineConfig({
         'src/catalog/catalog.js',
         'src/adoptante.js',
       ],
-      reporter: ['text', 'html'],
+      reporter: ['text', 'html', 'lcov'],
       thresholds: {
         statements: 100,
         branches: 100,

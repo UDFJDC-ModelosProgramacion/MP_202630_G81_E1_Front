@@ -1,8 +1,12 @@
 # Huellitas — solicitudes de adopción
 
-Interfaz frontend para las historias HU01–HU05, HU18–HU21 y HU33. Cada historia tiene una página separada y comparte el estilo visual de Huellitas.
+Interfaz frontend para las historias HU01–HU05, HU18–HU21, HU30 y HU33. Cada historia tiene una página separada y comparte el estilo visual de Huellitas.
 
 Los datos de HU01–HU05 y HU18–HU21 se guardan en `localStorage` como demostración; no se conectan a un backend. HU01 presenta la galería fotográfica y HU33 conserva la integración del catálogo con el API.
+
+## Tecnologías
+
+Vite, HTML5, CSS3, JavaScript (ES6+), Tailwind CSS, Vitest (pruebas unitarias), Playwright (pruebas de integración/e2e), Jenkins y SonarQube (calidad).
 
 ## Desarrollo
 
@@ -19,6 +23,10 @@ npm run test:e2e
 ```
 
 Las pruebas unitarias están separadas por historia (`tests/HUxx.test.js`) y las pruebas de navegador usan `e2e/HUxx.spec.ts`. Vitest exige 100 % de sentencias, ramas, funciones y líneas para los módulos de lógica.
+
+## Calidad (Jenkins y SonarQube)
+
+El pipeline está en `Jenkinsfile` y el análisis en `sonar-project.properties`. Jenkins y SonarQube se levantan en local con `docker compose up -d` (Jenkins en `http://localhost:8081`, SonarQube en `http://localhost:9000`).
 
 ## Añadir una historia
 
@@ -46,7 +54,9 @@ Página `HU05.html` para crear, editar y eliminar historias con título y descri
 
 ## HU33 — Catálogo de mascotas
 
-Página `HU33.html` que consulta `GET {API}/mascotas` del back-end y muestra las mascotas en tarjetas (nombre, especie, raza, edad, sexo, tamaño, estado y refugio). Incluye búsqueda por nombre o raza, filtros por especie y estado, mensajes de carga, error (con botón **Reintentar**) y lista vacía.
+Página `HU33.html` que consulta `GET {API}/mascotas` del back-end y muestra las mascotas en tarjetas (nombre, especie, raza, edad, sexo, tamaño, estado y refugio). Incluye búsqueda por nombre o raza, filtros por especie y estado, mensajes de carga, error (con botón **Reintentar**) y un mensaje cuando no hay mascotas disponibles.
+
+Cada tarjeta tiene un botón **Ver detalle** que abre `HU33.html?id={id}`, donde se consulta `GET {API}/mascotas/{id}` y se muestran todos los datos de la mascota. Si el id no existe se muestra «La mascota no fue encontrada.».
 
 ### Cómo ejecutar HU33
 
@@ -68,6 +78,16 @@ Si el back corre en otra dirección, crear un archivo `.env.local` con `VITE_API
 npm run test:unit   # Vitest, cobertura 100 % de src/catalog/catalog.js
 npm run test:e2e    # Playwright, el API se simula con page.route (no necesita el back)
 ```
+
+## HU30 — Gestionar refugios
+
+Página `HU30.html` para registrar y editar los datos de contacto de un refugio (nombre, ciudad, dirección, teléfono, correo y descripción).
+
+- **Registrar:** abrir `http://localhost:5173/HU30.html`, llenar el formulario y guardar (`POST {API}/refugios`). Todos los campos son obligatorios y el correo se valida; los errores aparecen bajo cada campo.
+- **Editar:** abrir `http://localhost:5173/HU30.html?id=1` (o escribir el número en «Editar un refugio existente»). Se carga el refugio con `GET {API}/refugios/{id}` y se guarda con `PUT {API}/refugios/{id}`. Si el id no existe se muestra «El refugio no fue encontrado.».
+- Mensajes de carga, éxito y error (incluidos los que devuelve el API), errores accesibles y uso completo con teclado.
+
+La lógica está en `src/workflows/HU30.js` (cobertura del 100 %), la interfaz en `src/pages/HU30.js` y las pruebas en `tests/HU30.test.js` y `e2e/HU30.spec.ts`. Las pruebas manuales de HU30 y HU33 están en [`docs/pruebas-manuales.md`](docs/pruebas-manuales.md).
 
 ## HU09 — Registrar adoptante
 

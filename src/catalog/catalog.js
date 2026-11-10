@@ -70,9 +70,13 @@ export async function fetchPet(fetchFn, id, apiUrl = DEFAULT_API_URL) {
   return normalizePet(data)
 }
 
-export function parsePetId(search = '') {
-  const id = new URLSearchParams(search).get('id')
-  return id !== null && /^\d+$/.test(id) ? id : null
+export function parsePetRoute(search = '') {
+  const params = new URLSearchParams(search)
+  const id = params.get('id')
+  return {
+    detail: params.has('id'),
+    id: id !== null && /^\d+$/.test(id) ? id : null,
+  }
 }
 
 function text(value, fallback = '') {
@@ -141,7 +145,7 @@ export function renderPetCard(pet) {
     : ''
   const detailLink = pet.id === null
     ? ''
-    : `<a class="btn btn-secondary mt-4 inline-block" href="/mascota.html?id=${encodeURIComponent(pet.id)}" aria-label="Ver detalle de ${escapeHtml(pet.name)}">Ver detalle</a>`
+    : `<a class="btn btn-secondary mt-4 inline-block" href="./HU33.html?id=${encodeURIComponent(pet.id)}" aria-label="Ver detalle de ${escapeHtml(pet.name)}">Ver detalle</a>`
 
   return `
     <li class="pet-card rounded-2xl border border-stone-200 bg-white p-5 shadow-sm" data-testid="pet-card">
