@@ -5,11 +5,15 @@ import { renderStoryLinks } from '../story-navigation.js'
 import { renderStorySidebar } from '../story-sidebar.js'
 import {
   ALL_FILTER,
+  PET_NOT_FOUND,
   describeResults,
+  fetchPet,
   fetchPets,
   filterPets,
   getApiUrl,
   getSpeciesOptions,
+  parsePetRoute,
+  renderPetDetail,
   renderPetList,
 } from './catalog.js'
 
@@ -30,7 +34,16 @@ const elements = {
   emptyText: $('#empty-text'),
   clear: $('#clear-filters'),
   list: $('#pet-list'),
+  catalogView: $('#catalog-view'),
+  detailView: $('#detail-view'),
+  detailLoading: $('#detail-loading'),
+  detailError: $('#detail-error'),
+  detailErrorText: $('#detail-error-text'),
+  detailRetry: $('#detail-retry'),
+  detail: $('#pet-detail'),
 }
+
+const route = parsePetRoute(window.location.search)
 
 let allPets = []
 
@@ -82,7 +95,7 @@ function render() {
   elements.summary.textContent = describeResults(shown.length, allPets.length)
 
   if (allPets.length === 0) {
-    elements.emptyText.textContent = 'Aún no hay mascotas registradas. Vuelve pronto.'
+    elements.emptyText.textContent = 'No hay mascotas disponibles por el momento. Vuelve pronto.'
     elements.clear.hidden = true
     showOnly('empty')
     return
@@ -113,6 +126,35 @@ async function loadCatalog() {
   }
 }
 
+function showDetailOnly(section) {
+  elements.detailLoading.hidden = section !== 'loading'
+  elements.detailError.hidden = section !== 'error'
+  elements.detail.hidden = section !== 'detail'
+}
+
+function showDetailError(message, canRetry) {
+  elements.detailErrorText.textContent = message
+  elements.detailRetry.hidden = !canRetry
+  showDetailOnly('error')
+}
+
+async function loadDetail() {
+  if (route.id === null) {
+    showDetailError(PET_NOT_FOUND, false)
+    return
+  }
+
+  showDetailOnly('loading')
+  try {
+    const pet = await fetchPet(window.fetch.bind(window), route.id, getApiUrl(import.meta.env))
+    document.title = `${pet.name} · Catálogo de mascotas | AdoptaPet`
+    elements.detail.innerHTML = renderPetDetail(pet)
+    showDetailOnly('detail')
+  } catch (error) {
+    showDetailError(error.message, error.status !== 404)
+  }
+}
+
 elements.filters.addEventListener('input', render)
 elements.filters.addEventListener('submit', (event) => event.preventDefault())
 elements.retry.addEventListener('click', loadCatalog)
@@ -121,5 +163,12 @@ elements.clear.addEventListener('click', () => {
   render()
   elements.search.focus()
 })
+elements.detailRetry.addEventListener('click', loadDetail)
 
-loadCatalog()
+if (route.detail) {
+  elements.catalogView.hidden = true
+  elements.detailView.hidden = false
+  loadDetail()
+} else {
+  loadCatalog()
+}

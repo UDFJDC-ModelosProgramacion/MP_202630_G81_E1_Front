@@ -57,3 +57,8 @@ nav a { color: var(--ink); font-weight: 600; text-decoration: underline; text-un
 .status-badge[data-status="Disponible"] { background: #dcfce7; color: #14532d; }
 .status-badge[data-status="En proceso de adopcion"] { background: #fef3c7; color: #78350f; }
 .status-badge[data-status="Adoptado"] { background: #e0e7ff; color: #312e81; }
+
+.detail-row { display: flex; flex-direction: column; }
+.detail-row dt { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.detail-row dd { margin: 0; font-size: 1rem; color: var(--ink); }
+.back-link { color: var(--accent-strong); font-weight: 600; }

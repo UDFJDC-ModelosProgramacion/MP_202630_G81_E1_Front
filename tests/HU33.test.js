@@ -3,15 +3,19 @@ import {
   ALL_FILTER,
   CatalogError,
   DEFAULT_API_URL,
+  PET_NOT_FOUND,
   describeResults,
   escapeHtml,
+  fetchPet,
   fetchPets,
   filterPets,
   formatAge,
   getApiUrl,
   getSpeciesOptions,
   normalizePet,
+  parsePetRoute,
   renderPetCard,
+  renderPetDetail,
   renderPetList,
   statusLabel,
 } from '../src/catalog/catalog.js'
@@ -204,9 +208,101 @@ describe('rendering', () => {
   })
 
   it('describes how many pets are shown', () => {
-    expect(describeResults(0, 0)).toBe('Aún no hay mascotas registradas.')
+    expect(describeResults(0, 0)).toBe('No hay mascotas disponibles.')
     expect(describeResults(1, 1)).toBe('Mostrando 1 mascota')
     expect(describeResults(3, 3)).toBe('Mostrando 3 mascotas')
     expect(describeResults(1, 3)).toBe('Mostrando 1 de 3 mascotas')
+  })
+})
+
+describe('fetchPet', () => {
+  it('requests one pet by id and returns it normalized', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(jsonResponse(rawMora))
+    const pet = await fetchPet(fetchFn, '1', 'http://api.test/api')
+    expect(fetchFn).toHaveBeenCalledWith('http://api.test/api/mascotas/1', {
+      headers: { Accept: 'application/json' },
+    })
+    expect(pet).toEqual(pets[0])
+  })
+
+  it('uses the default API URL when none is given', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(jsonResponse(rawMora))
+    await fetchPet(fetchFn, 1)
+    expect(fetchFn.mock.calls[0][0]).toBe(`${DEFAULT_API_URL}/mascotas/1`)
+  })
+
+  it('reports that the pet was not found when the id does not exist', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(jsonResponse({}, { ok: false, status: 404 }))
+    const error = await fetchPet(fetchFn, '999').catch((e) => e)
+    expect(error).toBeInstanceOf(CatalogError)
+    expect(error.message).toBe(PET_NOT_FOUND)
+    expect(error.status).toBe(404)
+  })
+
+  it('reports other HTTP errors with their status', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(jsonResponse({}, { ok: false, status: 500 }))
+    const error = await fetchPet(fetchFn, '1').catch((e) => e)
+    expect(error.status).toBe(500)
+    expect(error.message).toContain('no pudo entregar')
+  })
+
+  it('reports network failures', async () => {
+    const fetchFn = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'))
+    await expect(fetchPet(fetchFn, '1')).rejects.toThrow('No pudimos conectar con el servidor')
+  })
+
+  it('reports responses that are not a single pet', async () => {
+    for (const body of [null, 'texto', []]) {
+      const fetchFn = vi.fn().mockResolvedValue(jsonResponse(body))
+      await expect(fetchPet(fetchFn, '1')).rejects.toThrow('formato inesperado')
+    }
+  })
+
+  it('treats a 404 on the list as a generic server error', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(jsonResponse({}, { ok: false, status: 404 }))
+    const error = await fetchPets(fetchFn).catch((e) => e)
+    expect(error.status).toBe(404)
+    expect(error.message).toContain('no pudo entregar el catálogo')
+  })
+})
+
+describe('parsePetRoute', () => {
+  it('shows the catalog when there is no id', () => {
+    expect(parsePetRoute()).toEqual({ detail: false, id: null })
+    expect(parsePetRoute('?otro=1')).toEqual({ detail: false, id: null })
+  })
+
+  it('shows the detail with a numeric id', () => {
+    expect(parsePetRoute('?id=12')).toEqual({ detail: true, id: '12' })
+  })
+
+  it('shows the detail with an invalid id so the not found message appears', () => {
+    expect(parsePetRoute('?id=abc')).toEqual({ detail: true, id: null })
+    expect(parsePetRoute('?id=-3')).toEqual({ detail: true, id: null })
+  })
+})
+
+describe('pet detail rendering', () => {
+  it('links every card with an id to its detail', () => {
+    const html = renderPetCard(pets[0])
+    expect(html).toContain('href="./HU33.html?id=1"')
+    expect(html).toContain('aria-label="Ver detalle de Mora"')
+  })
+
+  it('renders every field of the pet', () => {
+    const html = renderPetDetail(pets[0])
+    for (const text of ['Mora', 'Perro', 'Criollo', '3 años', 'Hembra', 'Mediano', 'Juguetona', 'Huellitas · Bogotá']) {
+      expect(html).toContain(text)
+    }
+    expect(html).toContain('data-testid="pet-detail"')
+  })
+
+  it('shows placeholders for missing data and escapes user text', () => {
+    const html = renderPetDetail(normalizePet({ nombre: '<b>x</b>' }))
+    expect(html).not.toContain('<b>x</b>')
+    expect(html).toContain('&lt;b&gt;x&lt;/b&gt;')
+    expect(html).toContain('No registrado')
+    expect(html).toContain('Edad no registrada')
+    expect(html).toContain('Refugio no registrado')
   })
 })

@@ -17,6 +17,7 @@ const stories = [
   ['HU19', 'Formalizar adopción'],
   ['HU20', 'Prueba de convivencia'],
   ['HU21', 'Devolución'],
+  ['HU30', 'Gestionar refugios'],
   ['HU33', 'Catálogo de mascotas'],
 ]
 
