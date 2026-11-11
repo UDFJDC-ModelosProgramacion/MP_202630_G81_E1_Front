@@ -74,7 +74,7 @@ test('shows an empty state when there are no pets', async ({ page }) => {
   await mockPets(page, [])
   await page.goto('/HU33.html')
 
-  await expect(page.getByText('Aún no hay mascotas registradas. Vuelve pronto.')).toBeVisible()
+  await expect(page.getByText('No hay mascotas disponibles por el momento. Vuelve pronto.')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Limpiar filtros' })).toBeHidden()
   await expect(page.getByTestId('pet-card')).toHaveCount(0)
 })
@@ -116,4 +116,61 @@ test('can be used with the keyboard only', async ({ page }) => {
   await expect(page.getByTestId('pet-card')).toHaveCount(1)
   await page.keyboard.press('Tab')
   await expect(page.getByLabel('Especie')).toBeFocused()
+})
+
+const cors = { 'access-control-allow-origin': '*' }
+
+async function mockOnePet(page: Page, id: number | string, status: number, body: unknown) {
+  await page.route(new RegExp(`/api/mascotas/${id}$`), (route) => route.fulfill({
+    status,
+    contentType: 'application/json',
+    headers: cors,
+    body: JSON.stringify(body),
+  }))
+}
+
+test('opens the detail of a pet from the catalog', async ({ page }) => {
+  await mockPets(page, mascotas)
+  await mockOnePet(page, 1, 200, mascotas[0])
+  await page.goto('/HU33.html')
+
+  await page.getByRole('link', { name: 'Ver detalle de Mora' }).click()
+
+  await expect(page).toHaveURL(/HU33\.html\?id=1$/)
+  await expect(page.getByTestId('pet-detail')).toContainText('Mora')
+  await expect(page.getByTestId('pet-detail')).toContainText('Criollo')
+  await expect(page.getByTestId('pet-detail')).toContainText('Huellitas · Bogotá')
+  await expect(page.getByRole('link', { name: '← Volver al catálogo' })).toBeVisible()
+  await expect(page.getByTestId('pet-card')).toHaveCount(0)
+})
+
+test('shows an error when the pet does not exist', async ({ page }) => {
+  await mockOnePet(page, 999, 404, {})
+  await page.goto('/HU33.html?id=999')
+
+  await expect(page.getByRole('alert')).toContainText('La mascota no fue encontrada.')
+  await expect(page.getByRole('button', { name: 'Reintentar' })).toBeHidden()
+})
+
+test('shows a not found error when the id in the address is invalid', async ({ page }) => {
+  await page.goto('/HU33.html?id=abc')
+  await expect(page.getByRole('alert')).toContainText('La mascota no fue encontrada.')
+})
+
+test('lets the user retry the detail when the server fails', async ({ page }) => {
+  let calls = 0
+  await page.route(/\/api\/mascotas\/1$/, (route) => {
+    calls += 1
+    return route.fulfill({
+      status: calls === 1 ? 500 : 200,
+      contentType: 'application/json',
+      headers: cors,
+      body: calls === 1 ? '{}' : JSON.stringify(mascotas[0]),
+    })
+  })
+  await page.goto('/HU33.html?id=1')
+
+  await expect(page.getByRole('alert')).toContainText('no pudo entregar')
+  await page.getByRole('button', { name: 'Reintentar' }).click()
+  await expect(page.getByTestId('pet-detail')).toContainText('Mora')
 })
