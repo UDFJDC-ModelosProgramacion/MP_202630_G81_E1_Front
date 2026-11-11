@@ -1,6 +1,6 @@
 # Huellitas — solicitudes de adopción
 
-Interfaz frontend para las historias HU01–HU05, HU18–HU21, HU30 y HU33. Cada historia tiene una página separada y comparte el estilo visual de Huellitas.
+Interfaz frontend para las historias HU01–HU05, HU09–HU17, HU18–HU21, HU30 y HU33. Cada historia tiene una página separada y comparte el estilo visual de Huellitas.
 
 Los datos de HU01–HU05 y HU18–HU21 se guardan en `localStorage` como demostración; no se conectan a un backend. HU01 presenta la galería fotográfica y HU33 conserva la integración del catálogo con el API.
 
@@ -88,27 +88,3 @@ Página `HU30.html` para registrar y editar los datos de contacto de un refugio 
 - Mensajes de carga, éxito y error (incluidos los que devuelve el API), errores accesibles y uso completo con teclado.
 
 La lógica está en `src/workflows/HU30.js` (cobertura del 100 %), la interfaz en `src/pages/HU30.js` y las pruebas en `tests/HU30.test.js` y `e2e/HU30.spec.ts`. Las pruebas manuales de HU30 y HU33 están en [`docs/pruebas-manuales.md`](docs/pruebas-manuales.md).
-
-## HU09 — Registrar adoptante
-
-Formulario para que una persona se registre como adoptante. Envía los datos (nombre, correo, teléfono, ciudad y dirección) al backend con `POST /api/adoptantes`, muestra los errores de validación del formulario y los que devuelve la API (por ejemplo, un correo ya registrado) y, al terminar, confirma el registro y guarda el número de adoptante en el navegador.
-
-### Cómo ejecutarla
-
-1. Levanta el backend (`MP_202630_G81_E1_Back`) en `http://localhost:8080`. La URL base de la API está en `src/adoptante.js` (`API_BASE_URL`).
-2. En este repositorio:
-
-```sh
-npm install
-npm run dev
-```
-
-3. Abre `http://localhost:5173/HU09.html` (también está el enlace «Registro» en la navegación de la página).
-
-### Pruebas
-
-```sh
-npm run test:unit
-```
-
-La lógica de HU09 está en `src/adoptante.js` y sus pruebas en `tests/adoptante.test.js` (cobertura del 100 %). La interfaz está en `registro-adoptante.html` y `src/registro-adoptante.js`.
