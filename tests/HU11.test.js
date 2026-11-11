@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getAdoptante, listAdoptantes } from '../src/workflows/HU11.js'
 
-const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, json: async () => body })
+const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, text: async () => JSON.stringify(body) })
 
 describe('HU11 adoptantes list', () => {
   it('lists adoptantes sorted by name', async () => {

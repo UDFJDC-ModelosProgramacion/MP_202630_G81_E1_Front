@@ -7,11 +7,15 @@ export function getApiUrl(env = import.meta.env) {
   return (configured || DEFAULT_API_URL).replace(/\/+$/, '')
 }
 
+const INVALID_JSON = Symbol('invalid-json')
+
 async function readJson(response) {
+  const text = await response.text()
+  if (!text) return {}
   try {
-    return await response.json()
+    return JSON.parse(text)
   } catch {
-    return {}
+    return INVALID_JSON
   }
 }
 
@@ -35,7 +39,11 @@ export async function apiRequest(path, {
   }
 
   const data = await readJson(response)
-  if (!response.ok) return { ok: false, message: data.apierror?.message ?? UNEXPECTED_ERROR }
+  if (!response.ok) {
+    const message = data === INVALID_JSON ? undefined : data?.apierror?.message
+    return { ok: false, message: message ?? UNEXPECTED_ERROR }
+  }
+  if (data === INVALID_JSON) return { ok: false, message: UNEXPECTED_ERROR }
   return { ok: true, data }
 }
 

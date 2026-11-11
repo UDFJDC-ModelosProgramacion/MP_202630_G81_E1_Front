@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getNotifications } from '../src/workflows/HU17.js'
 
-const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, json: async () => body })
+const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, text: async () => JSON.stringify(body) })
 
 describe('HU17 notifications', () => {
   it('returns the notifications of the adoptante, newest first', async () => {

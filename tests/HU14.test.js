@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { buildVaccinationPayload, createVaccination, listMascotas, validateVaccination } from '../src/workflows/HU14.js'
 
-const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, json: async () => body })
+const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, text: async () => JSON.stringify(body) })
 const values = { mascotaId: '3', vacunaId: '2', fechaAplicacion: '2026-10-01', proximaFecha: '2027-10-01', numeroLote: ' L-45 ', observacion: ' Sin reacciones ' }
 
 describe('HU14 vaccination registration', () => {

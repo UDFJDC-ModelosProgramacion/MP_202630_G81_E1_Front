@@ -17,7 +17,7 @@ const validValues = {
 }
 
 function jsonResponse(body, ok = true) {
-  return { ok, json: async () => body }
+  return { ok, text: async () => JSON.stringify(body) }
 }
 
 describe('validateAdoptante', () => {

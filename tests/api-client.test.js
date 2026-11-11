@@ -10,7 +10,7 @@ import {
   withData,
 } from '../src/api/client.js'
 
-const json = (body, ok = true) => ({ ok, json: async () => body })
+const json = (body, ok = true) => ({ ok, text: async () => JSON.stringify(body) })
 
 afterEach(() => vi.unstubAllGlobals())
 
@@ -55,8 +55,23 @@ describe('apiRequest', () => {
   })
 
   it('accepts empty successful responses', async () => {
-    const fetchFn = vi.fn().mockResolvedValue({ ok: true, json: async () => { throw new SyntaxError('empty') } })
+    const fetchFn = vi.fn().mockResolvedValue({ ok: true, text: async () => '' })
     expect(await apiRequest('/vacunas/1', { method: 'DELETE', fetchFn })).toEqual({ ok: true, data: {} })
+  })
+
+  it('reports an error when a successful response has invalid JSON', async () => {
+    const fetchFn = vi.fn().mockResolvedValue({ ok: true, text: async () => '<html>oops</html>' })
+    expect(await apiRequest('/vacunas', { fetchFn })).toEqual({ ok: false, message: UNEXPECTED_ERROR })
+  })
+
+  it('uses a generic message when the error body is not valid JSON', async () => {
+    const fetchFn = vi.fn().mockResolvedValue({ ok: false, text: async () => 'Bad gateway' })
+    expect(await apiRequest('/vacunas', { fetchFn })).toEqual({ ok: false, message: UNEXPECTED_ERROR })
+  })
+
+  it('uses a generic message when the error body is null', async () => {
+    const fetchFn = vi.fn().mockResolvedValue({ ok: false, text: async () => 'null' })
+    expect(await apiRequest('/vacunas', { fetchFn })).toEqual({ ok: false, message: UNEXPECTED_ERROR })
   })
 
   it('returns the API message on errors', async () => {

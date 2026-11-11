@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getVacuna, listVacunas } from '../src/workflows/HU12.js'
 
-const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, json: async () => body })
+const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, text: async () => JSON.stringify(body) })
 
 describe('HU12 vaccine catalog', () => {
   it('lists vaccines sorted by name', async () => {

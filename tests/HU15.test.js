@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getVaccinationHistory } from '../src/workflows/HU15.js'
 
-const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, json: async () => body })
+const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, text: async () => JSON.stringify(body) })
 const registros = [
   { id: 1, fechaAplicacion: '2026-01-10T05:00:00.000+00:00', mascota: { id: 3 }, vacuna: { nombre: 'Rabia' } },
   { id: 2, fechaAplicacion: '2026-08-10T05:00:00.000+00:00', mascota: { id: 3 }, vacuna: { nombre: 'Moquillo' } },

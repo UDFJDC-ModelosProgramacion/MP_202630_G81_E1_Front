@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { loadProfile, saveProfile, validateProfile } from '../src/workflows/HU10.js'
 
 const values = { nombre: ' Camila ', email: 'c@x.co', telefono: '3001234567', ciudad: 'Bogotá', direccion: 'Cra 1' }
-const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, json: async () => body })
+const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, text: async () => JSON.stringify(body) })
 
 describe('HU10 adoptante profile', () => {
   it('validates the profile like the registration', () => {

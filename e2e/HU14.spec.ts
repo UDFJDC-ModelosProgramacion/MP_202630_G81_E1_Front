@@ -14,7 +14,7 @@ test('HU14 validates and registers a vaccination', async ({ page }) => {
   await expect(page.locator('#vaccination-numeroLote-error')).toHaveText('Ingresa el número de lote.')
 
   await page.getByLabel('Mascota').selectOption({ label: 'Luna' })
-  await page.getByLabel('Vacuna', { exact: true }).selectOption({ label: 'Rabia' })
+  await page.getByRole('combobox', { name: /^Vacuna/ }).selectOption({ label: 'Rabia' })
   await page.getByLabel('Fecha de aplicación').fill('2026-10-01')
   await page.getByLabel('Número de lote').fill('L-2045')
   await page.getByRole('button', { name: /Registrar vacunación/ }).click()
@@ -30,7 +30,7 @@ test('HU14 shows the message of the API when it rejects the registration', async
   })
   await page.goto('/HU14.html')
   await page.getByLabel('Mascota').selectOption({ label: 'Luna' })
-  await page.getByLabel('Vacuna', { exact: true }).selectOption({ label: 'Rabia' })
+  await page.getByRole('combobox', { name: /^Vacuna/ }).selectOption({ label: 'Rabia' })
   await page.getByLabel('Fecha de aplicación').fill('2026-10-01')
   await page.getByLabel('Número de lote').fill('L-1')
   await page.getByRole('button', { name: /Registrar vacunación/ }).click()

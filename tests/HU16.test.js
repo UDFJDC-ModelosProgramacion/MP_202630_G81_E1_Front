@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { deleteVaccination, toEditValues, updateVaccination } from '../src/workflows/HU16.js'
 
-const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, json: async () => body })
+const reply = (body, ok = true) => vi.fn().mockResolvedValue({ ok, text: async () => JSON.stringify(body) })
 const registro = {
   id: 8,
   fechaAplicacion: '2026-10-01T05:00:00.000+00:00',
