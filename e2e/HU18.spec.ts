@@ -63,6 +63,7 @@ test('lets the adopter return to the form after sending an adoption request', as
 
 test('opens the mobile navigation when requested', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/HU18.html')
   const menu = page.locator('.menu-toggle')
 
   await menu.click()
@@ -70,9 +71,43 @@ test('opens the mobile navigation when requested', async ({ page }) => {
   await expect(menu).toHaveAttribute('aria-expanded', 'true')
   await expect(menu).toHaveAttribute('aria-label', 'Cerrar navegación')
   await expect(page.getByRole('navigation', { name: 'Navegación principal' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'HU33 · Catálogo de mascotas' })).toBeVisible()
 
   await menu.click()
   await expect(menu).toHaveAttribute('aria-expanded', 'false')
+})
+
+test('keeps the complete story menu usable at tablet and desktop widths', async ({ page }) => {
+  await page.goto('/HU18.html')
+
+  for (const width of [768, 1280]) {
+    await page.setViewportSize({ width, height: 900 })
+    const menu = page.locator('.menu-toggle')
+    await expect(menu).toBeVisible()
+    await menu.click()
+    const navigation = page.getByRole('navigation', { name: 'Navegación principal' })
+    await expect(navigation).toBeVisible()
+    await expect(navigation.getByRole('link', { name: 'HU33 · Catálogo de mascotas' })).toBeVisible()
+    await menu.click()
+  }
+})
+
+test('scrolls through the long mobile menu to the last story', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/HU18.html')
+  await page.locator('.menu-toggle').click()
+
+  const navigation = page.getByRole('navigation', { name: 'Navegación principal' })
+  const dimensions = await navigation.evaluate((element) => ({
+    hasVerticalOverflow: element.scrollHeight > element.clientHeight,
+    overflowY: getComputedStyle(element).overflowY,
+  }))
+  expect(dimensions).toEqual({ hasVerticalOverflow: true, overflowY: 'auto' })
+
+  const finalStory = navigation.getByRole('link', { name: 'HU33 · Catálogo de mascotas' })
+  await finalStory.scrollIntoViewIfNeeded()
+  await finalStory.click()
+  await expect(page).toHaveURL(/HU33\.html$/)
 })
 
 test('shows the home page as the central navigation hub', async ({ page }) => {

@@ -57,6 +57,8 @@ main,
 }
 
 .site-header {
+  position: relative;
+  z-index: 10;
   height: 82px;
   display: flex;
   align-items: center;
@@ -91,16 +93,38 @@ main,
 }
 
 .header-nav {
-  display: flex;
-  align-items: center;
-  gap: 35px;
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 1px);
+  right: 0;
+  display: none;
+  width: min(440px, 100%);
+  max-height: min(70dvh, 640px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: white;
+  box-shadow: 0 10px 25px rgba(39, 57, 45, 0.1);
   color: #69756d;
   font-size: 13px;
 }
 
+.header-nav.nav-open {
+  display: grid;
+}
+
 .header-nav a {
+  display: block;
+  padding: 11px 8px;
+  border-bottom: 1px solid #edf0ec;
   text-decoration: none;
   transition: color 150ms ease;
+}
+
+.header-nav a:last-child {
+  border-bottom: 0;
 }
 
 .header-nav a:hover,
@@ -121,7 +145,7 @@ main,
 }
 
 .menu-toggle {
-  display: none;
+  display: block;
   padding: 10px;
   border: 0;
   background: transparent;
@@ -684,6 +708,12 @@ main,
 .admin-record img { width: 72px; height: 58px; flex: 0 0 auto; border-radius: 5px; background: #edf0ec; object-fit: cover; }
 .photo-record { align-items: flex-start; }
 .record-badge { width: max-content; padding: 4px 7px; border-radius: 4px; background: #f9e8e4; color: #b94e4e; font-size: 9px; font-weight: 750; }
+.record-badge.message-read { background: #e7efe7; color: #52745c; }
+.message-select-label { display: flex; flex: 0 0 auto; align-items: center; }
+.message-select { width: 14px; height: 14px; accent-color: var(--green); }
+.message-bulk-actions { margin-bottom: 14px; color: var(--muted); font-size: 11px; }
+.message-record { align-items: center; }
+.message-record .admin-record-actions button:disabled { cursor: not-allowed; opacity: 0.48; }
 .danger-button { border-color: #efc7c1 !important; color: #b94e4e !important; }
 .admin-empty { padding: 16px; border: 1px dashed #dfe3dd; border-radius: 7px; color: var(--muted); font-size: 11px; list-style: none; }
 .admin-check { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; }
@@ -1586,39 +1616,6 @@ main,
   .site-header {
     position: relative;
     height: 68px;
-  }
-
-  .menu-toggle {
-    display: block;
-  }
-
-  .header-nav {
-    position: absolute;
-    z-index: 5;
-    top: 59px;
-    right: 0;
-    left: 0;
-    display: none;
-    align-items: stretch;
-    gap: 0;
-    padding: 8px 14px;
-    border: 1px solid var(--line);
-    border-radius: 9px;
-    background: white;
-    box-shadow: 0 10px 25px rgba(39, 57, 45, 0.1);
-  }
-
-  .header-nav.nav-open {
-    display: grid;
-  }
-
-  .header-nav a {
-    padding: 11px 4px;
-  }
-
-  .header-nav .header-link {
-    margin: 4px 0;
-    padding-inline: 9px;
   }
 
   .page-intro {

@@ -1,8 +1,8 @@
 # Huellitas — solicitudes de adopción
 
-Interfaz frontend para las historias HU01–HU05, HU09–HU17, HU18–HU21, HU30 y HU33. Cada historia tiene una página separada y comparte el estilo visual de Huellitas.
+Interfaz frontend para las historias HU01–HU17, HU18–HU21, HU30 y HU33. Cada historia tiene una página separada y comparte el estilo visual de Huellitas.
 
-Los datos de HU01–HU05 y HU18–HU21 se guardan en `localStorage` como demostración; no se conectan a un backend. HU01 presenta la galería fotográfica y HU33 conserva la integración del catálogo con el API.
+Los datos de HU01–HU08 y HU18–HU21 se guardan en `localStorage` como demostración; no se conectan a un backend. HU01 presenta la galería fotográfica y HU33 conserva la integración del catálogo con el API.
 
 ## Tecnologías
 
@@ -51,6 +51,18 @@ Página `HU04.html` que combina eventos y registros de adopción/devolución, lo
 ## HU05 — Publicar historias de éxito
 
 Página `HU05.html` para crear, editar y eliminar historias con título y descripción. Solo permite publicar o editar historias cuyo registro de mascota no esté marcado como inactivo o retirado.
+
+## HU06 — Consultar historias de éxito
+
+Página `HU06.html` para consultar los relatos publicados de una mascota. Muestra título, descripción y fecha, además de estados para mascotas inexistentes o inactivas y mascotas sin historias.
+
+## HU07 — Enviar y recibir mensajes
+
+Página `HU07.html` para consultar la bandeja del adoptante y enviar mensajes asociados a una mascota. Permite editar o eliminar mensajes propios no leídos; los registros de demostración se asocian al adoptante Samuel.
+
+## HU08 — Organizar mensajes
+
+Página `HU08.html` para marcar mensajes propios como leídos o no leídos, individualmente o en grupo. No permite organizar mensajes de otro adoptante ni eliminar un mensaje ya leído.
 
 ## HU33 — Catálogo de mascotas
 
