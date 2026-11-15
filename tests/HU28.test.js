@@ -6,6 +6,7 @@ import {
   createMedicalEvent,
   updateMedicalEvent,
   getMedicalEvents,
+  getPets,
 } from '../src/workflows/HU28.js';
 
 const originalEvent = {
@@ -274,6 +275,190 @@ describe('HU28 - Registrar eventos médicos', () => {
       );
 
       expect(fetch).not.toHaveBeenCalled();
+    });
+  });
+});
+
+describe('HU28 - cobertura adicional', () => {
+  const validValues = {
+    mascotaId: '10',
+    fecha: '2026-10-20',
+    descripcion: 'Revisión general',
+    diagnostico: 'Gripe',
+    tratamiento: 'Medicamento',
+  };
+
+  function mockResponse(data, status = 200) {
+    return {
+      ok: status >= 200 && status < 300,
+      status,
+      text: async () => data === null ? '' : JSON.stringify(data),
+      json: async () => data,
+    };
+  }
+
+  beforeEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('rechaza valores nulos y fechas con formato incorrecto', () => {
+    const errors = validateMedicalEvent({
+      mascotaId: null,
+      fecha: '20/10/2026',
+      descripcion: null,
+      diagnostico: null,
+      tratamiento: null,
+    });
+
+    expect(errors.mascotaId).toBeDefined();
+    expect(errors.fecha).toBe('La fecha no tiene un formato válido.');
+    expect(errors.descripcion).toBeDefined();
+    expect(errors.diagnostico).toBeDefined();
+    expect(errors.tratamiento).toBeDefined();
+  });
+
+  it('rechaza campos nulos al editar', () => {
+    const errors = validateMedicalEventUpdate({
+      descripcion: null,
+      diagnostico: null,
+      tratamiento: null,
+    });
+
+    expect(errors.descripcion).toBeDefined();
+    expect(errors.diagnostico).toBeDefined();
+    expect(errors.tratamiento).toBeDefined();
+  });
+
+  it('obtiene eventos desde content', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ content: [originalEvent] })
+    ));
+
+    expect(await getMedicalEvents()).toHaveLength(1);
+  });
+
+  it('obtiene eventos desde data', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ data: [originalEvent] })
+    ));
+
+    expect(await getMedicalEvents()).toHaveLength(1);
+  });
+
+  it('devuelve una lista vacía cuando no hay eventos', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({})
+    ));
+
+    expect(await getMedicalEvents()).toEqual([]);
+  });
+
+  it('devuelve una lista vacía cuando la respuesta es nula', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse(null)
+    ));
+
+    expect(await getMedicalEvents()).toEqual([]);
+  });
+
+  it('consulta mascotas como lista', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse([{ id: 10, nombre: 'Luna' }])
+    ));
+
+    expect(await getPets()).toHaveLength(1);
+  });
+
+  it('consulta mascotas desde content', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ content: [{ id: 10 }] })
+    ));
+
+    expect(await getPets()).toHaveLength(1);
+  });
+
+  it('consulta mascotas desde data', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ data: [{ id: 10 }] })
+    ));
+
+    expect(await getPets()).toHaveLength(1);
+  });
+
+  it('devuelve mascotas vacías si no hay datos', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse(null)
+    ));
+
+    expect(await getPets()).toEqual([]);
+  });
+
+  it('maneja una respuesta HTTP 204', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+    }));
+
+    expect(await createMedicalEvent(validValues)).toBeNull();
+  });
+
+  it('maneja una respuesta HTTP 200 sin contenido', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse(null)
+    ));
+
+    expect(await createMedicalEvent(validValues)).toBeNull();
+  });
+
+  it('muestra el mensaje de error del backend', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ message: 'Error personalizado' }, 400)
+    ));
+
+    await expect(createMedicalEvent(validValues))
+      .rejects.toThrow('Error personalizado');
+  });
+
+  it('usa error como mensaje alternativo', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ error: 'Error interno' }, 500)
+    ));
+
+    await expect(createMedicalEvent(validValues))
+      .rejects.toThrow('Error interno');
+  });
+
+  it('usa mensaje HTTP cuando el backend no da detalles', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({}, 500)
+    ));
+
+    await expect(createMedicalEvent(validValues))
+      .rejects.toThrow('Error HTTP 500');
+  });
+
+  it('maneja respuestas de error sin JSON válido', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: async () => {
+        throw new SyntaxError('JSON inválido');
+      },
+    }));
+
+    await expect(createMedicalEvent(validValues))
+      .rejects.toThrow('Error HTTP 500');
+  });
+
+  it('conserva los encabezados JSON al registrar', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ id: 1 })
+    ));
+
+    await createMedicalEvent(validValues);
+
+    expect(fetch.mock.calls[0][1].headers).toEqual({
+      'Content-Type': 'application/json',
     });
   });
 });
