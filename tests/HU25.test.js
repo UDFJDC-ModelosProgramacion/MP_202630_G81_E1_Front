@@ -213,4 +213,21 @@ describe('rendering', () => {
     expect(renderReviewList([review])).toContain('data-testid="review-card"')
     expect(renderReviewList([])).toBe('')
   })
+    it('renders a review without rating', () => {
+    const html = renderReviewCard({
+      ...review,
+      rating: null,
+    })
+
+    expect(html).toContain('Sin calificacion')
+  })
+
+  it('renders a review without ID', () => {
+    const html = renderReviewCard({
+      ...review,
+      id: null,
+    })
+
+    expect(html).toContain('N/A')
+  })
 })
