@@ -146,6 +146,17 @@ describe('normalizePet', () => {
       species: 'Especie no registrada',
     })
   })
+
+  it('uses null when pet ID is missing', () => {
+    expect(normalizePet({
+      nombre: 'Mora',
+      especie: 'Perro',
+    })).toEqual({
+      id: null,
+      name: 'Mora',
+      species: 'Perro',
+    })
+  })
 })
 
 describe('normalizeAdopter', () => {
@@ -164,6 +175,60 @@ describe('normalizeAdopter', () => {
   it('uses a default name when no name is available', () => {
     expect(normalizeAdopter({ id: 4 }).name).toBe('Adoptante 4')
   })
+
+  it('normalizes missing and invalid adopter information', () => {
+    expect(normalizeAdopter({
+      nombre: ' ',
+      apellido: null,
+      apellidos: 123,
+    })).toEqual({
+      id: null,
+      name: 'Adoptante ',
+    })
+
+    expect(normalizeAdopter({
+      nombre: 'Juan',
+      apellido: ' ',
+      apellidos: 'Gomez',
+    })).toEqual({
+      id: null,
+      name: 'Juan Gomez',
+    })
+  })
+    it('uses empty fallback when adopter ID is null', () => {
+    expect(normalizeAdopter({
+      id: null,
+    })).toEqual({
+      id: null,
+      name: 'Adoptante ',
+    })
+  })
+  it('uses fallback when full name is empty', () => {
+  expect(normalizeAdopter({
+    id: 5,
+    nombreCompleto: '   ',
+  })).toEqual({
+    id: 5,
+    name: 'Adoptante 5',
+  })
+})
+  it('uses fallback when adopter ID is zero', () => {
+  expect(normalizeAdopter({
+    id: 0,
+  })).toEqual({
+    id: 0,
+    name: 'Adoptante 0',
+  })
+})
+  it('uses null when adopter ID is undefined', () => {
+  expect(normalizeAdopter({
+    id: undefined,
+    nombre: 'Carlos',
+  })).toEqual({
+    id: null,
+    name: 'Carlos',
+  })
+})
 })
 
 describe('normalizeReview', () => {
@@ -217,6 +282,62 @@ describe('normalizeReview', () => {
       adopterName: 'Adoptante',
     })
   })
+    it('uses alternative IDs when relationships have no IDs', () => {
+    expect(normalizeReview({
+      mascota: {},
+      mascotaId: 7,
+      adoptante: {},
+      adoptanteId: 9,
+    })).toMatchObject({
+      petId: 7,
+      adopterId: 9,
+      petName: 'Mascota',
+      adopterName: 'Adoptante',
+    })
+  })
+
+  it('uses default values when review information is missing', () => {
+    expect(normalizeReview({})).toEqual({
+      id: null,
+      rating: null,
+      comment: '',
+      date: '',
+      petId: null,
+      petName: 'Mascota',
+      adopterId: null,
+      adopterName: 'No especificado',
+    })
+  })
+
+  it('normalizes an adopter with only the last surname', () => {
+    expect(normalizeReview({
+      adoptante: {
+        id: 3,
+        apellidos: 'Gomez',
+      },
+    }).adopterName).toBe('Gomez')
+  })
+
+  it('ignores empty or invalid adopter name fields', () => {
+    expect(normalizeReview({
+      adoptante: {
+        nombre: ' ',
+        apellido: null,
+        apellidos: 123,
+      },
+    }).adopterName).toBe('Adoptante')
+  })
+
+  it('normalizes an adopter with all name fields', () => {
+    expect(normalizeReview({
+      adoptante: {
+        nombre: 'Ana',
+        apellido: 'Maria',
+        apellidos: 'Perez',
+      },
+    }).adopterName).toBe('Ana Maria Perez')
+  })
+
 })
 
 describe('fetchPets', () => {
