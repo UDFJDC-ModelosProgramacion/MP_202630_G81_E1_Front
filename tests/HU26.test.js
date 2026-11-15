@@ -213,3 +213,158 @@ describe('createNotification', () => {
     expect(fetchFn).not.toHaveBeenCalled()
   })
 })
+describe('additional coverage HU26', () => {
+  it('normalizes pets without ID or species', () => {
+    expect(normalizePet({ nombre: 'Mora' })).toEqual({
+      id: null,
+      name: 'Mora',
+      species: '',
+      label: 'Mora (ID ?)',
+    })
+  })
+
+  it('normalizes adopters without ID and with full name', () => {
+    expect(normalizeAdopter({
+      nombreCompleto: ' Ana Pérez ',
+    })).toEqual({
+      id: null,
+      name: 'Ana Pérez',
+      label: 'Ana Pérez (ID ?)',
+    })
+  })
+
+  it('normalizes adopters with apellido only', () => {
+    expect(normalizeAdopter({
+      id: 8,
+      apellido: 'Gómez',
+    }).name).toBe('Gómez')
+  })
+
+  it('filters pets without ID', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(jsonResponse([
+      { nombre: 'Sin ID' },
+      { id: 2, nombre: 'Mora' },
+    ]))
+
+    const result = await fetchPets(fetchFn)
+
+    expect(result).toHaveLength(1)
+    expect(result[0].id).toBe(2)
+  })
+
+  it('filters adopters without ID', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(jsonResponse([
+      { nombre: 'Sin ID' },
+      { id: 7, nombre: 'Ana' },
+    ]))
+
+    const result = await fetchAdopters(fetchFn)
+
+    expect(result).toHaveLength(1)
+    expect(result[0].id).toBe(7)
+  })
+
+  it('handles a successful response without content', async () => {
+    const fetchFn = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+    })
+
+    expect(await createNotification(fetchFn, validValues)).toBeNull()
+  })
+
+  it('handles unreadable successful JSON', async () => {
+    const fetchFn = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: vi.fn().mockRejectedValue(new SyntaxError('Invalid JSON')),
+    })
+
+    await expect(createNotification(fetchFn, validValues))
+      .rejects.toThrow('no se puede leer')
+  })
+
+  it('handles unreadable error JSON', async () => {
+    const fetchFn = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: vi.fn().mockRejectedValue(new SyntaxError('Invalid JSON')),
+    })
+
+    await expect(createNotification(fetchFn, validValues))
+      .rejects.toThrow('No fue posible registrar la notificación.')
+  })
+
+  it('uses mensaje when backend returns an error', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(jsonResponse(
+      { mensaje: 'Error de notificación' },
+      { ok: false, status: 400 },
+    ))
+
+    await expect(createNotification(fetchFn, validValues))
+      .rejects.toThrow('Error de notificación')
+  })
+
+  it('uses error when backend returns an error', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(jsonResponse(
+      { error: 'Error interno' },
+      { ok: false, status: 500 },
+    ))
+
+    await expect(createNotification(fetchFn, validValues))
+      .rejects.toThrow('Error interno')
+  })
+
+  it('uses fallback message when backend returns no error details', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(jsonResponse(
+      {},
+      { ok: false, status: 500 },
+    ))
+
+    await expect(createNotification(fetchFn, validValues))
+      .rejects.toThrow('No fue posible registrar la notificación.')
+  })
+
+  it('rejects invalid dates and IDs', () => {
+    expect(isValidDate(null)).toBe(false)
+    expect(isValidDate('2026-02-29')).toBe(false)
+
+    expect(validateNotification({
+      ...validValues,
+      mascotaId: '2.5',
+      adoptanteId: '-1',
+    })).toMatchObject({
+      mascotaId: 'Selecciona una mascota existente.',
+      adoptanteId: 'Selecciona un adoptante válido.',
+    })
+  })
+
+  it('uses default URL for invalid environment configuration', () => {
+    expect(getApiUrl({ VITE_API_URL: null })).toBe(DEFAULT_API_URL)
+    expect(getApiUrl({ VITE_API_URL: '   ' })).toBe(DEFAULT_API_URL)
+  })
+  it('uses first name when full name is unavailable', () => {
+  expect(normalizeAdopter({
+    id: 9,
+    nombre: 'Carlos',
+    apellido: '',
+    apellidos: '',
+    nombreCompleto: '',
+  })).toEqual({
+    id: 9,
+    name: 'Carlos',
+    label: 'Carlos (ID 9)',
+  })
+})
+it('normalizes a pet with species but without ID', () => {
+  expect(normalizePet({
+    nombre: 'Mora',
+    especie: 'Perro',
+  })).toEqual({
+    id: null,
+    name: 'Mora',
+    species: 'Perro',
+    label: 'Mora · Perro (ID ?)',
+  })
+})
+})
