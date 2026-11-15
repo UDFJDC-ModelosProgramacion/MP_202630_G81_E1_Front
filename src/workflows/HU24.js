@@ -131,8 +131,8 @@ export function normalizeAdopter(raw) {
     .join(' ')
 
   return {
-    id: raw.id ?? null,
-    name: safeText(fullName, safeText(raw.nombreCompleto, `Adoptante ${raw.id ?? ''}`)),
+    id: raw.id == null ? null : raw.id,
+    name: safeText(fullName, safeText(raw.nombreCompleto, `Adoptante ${raw.id == null ? '' : raw.id}`)),
   }
 }
 
