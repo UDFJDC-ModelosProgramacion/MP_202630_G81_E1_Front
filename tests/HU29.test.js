@@ -150,3 +150,135 @@ describe('HU29 - Consulta de historial médico', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
+
+describe('HU29 - cobertura adicional', () => {
+  it('obtiene mascotas desde content', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ content: [{ id: 10, nombre: 'Mora' }] })
+    ));
+
+    expect(await getPets()).toHaveLength(1);
+  });
+
+  it('obtiene mascotas desde data', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ data: [{ id: 20, nombre: 'Luna' }] })
+    ));
+
+    expect(await getPets()).toHaveLength(1);
+  });
+
+  it('devuelve mascotas vacías si la respuesta no contiene datos', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({})
+    ));
+
+    expect(await getPets()).toEqual([]);
+  });
+
+  it('devuelve mascotas vacías si la respuesta es nula', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse(null)
+    ));
+
+    expect(await getPets()).toEqual([]);
+  });
+
+  it('obtiene eventos médicos desde content', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ content: events })
+    ));
+
+    expect(await getMedicalEvents()).toHaveLength(3);
+  });
+
+  it('obtiene eventos médicos desde data', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ data: events })
+    ));
+
+    expect(await getMedicalEvents()).toHaveLength(3);
+  });
+
+  it('devuelve eventos vacíos cuando no hay datos', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({})
+    ));
+
+    expect(await getMedicalEvents()).toEqual([]);
+  });
+
+  it('devuelve eventos vacíos cuando la respuesta es nula', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse(null)
+    ));
+
+    expect(await getMedicalEvents()).toEqual([]);
+  });
+
+  it('obtiene ID usando mascotaId cuando no existe mascota.id', () => {
+    expect(getPetId({ mascotaId: 25 })).toBe(25);
+  });
+
+  it('devuelve cadena vacía si el evento no tiene mascota', () => {
+    expect(getPetId({})).toBe('');
+    expect(getPetId(null)).toBe('');
+  });
+
+  it('obtiene ID alternativo cuando mascota.id es nulo', () => {
+    expect(getPetId({
+      mascota: { id: null },
+      mascotaId: 30,
+    })).toBe(30);
+  });
+
+  it('filtra eventos sin diagnóstico', () => {
+    const medicalEvents = [
+      { id: 1, mascota: { id: 10 }, diagnostico: null },
+      { id: 2, mascota: { id: 20 }, diagnostico: 'Gripe' },
+    ];
+
+    expect(filterMedicalEvents(medicalEvents, 10)).toHaveLength(1);
+    expect(filterMedicalEvents(medicalEvents, 10, 'gripe')).toEqual([]);
+  });
+
+  it('filtra eventos usando mascotaId alternativo', () => {
+    const medicalEvents = [
+      { id: 1, mascotaId: 10, diagnostico: 'Gripe' },
+      { id: 2, mascotaId: 20, diagnostico: 'Gripe' },
+    ];
+
+    expect(filterMedicalEvents(medicalEvents, 10, 'gripe'))
+      .toHaveLength(1);
+  });
+
+  it('maneja errores HTTP diferentes de 404', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({}, 500)
+    ));
+
+    await expect(getMedicalEvents())
+      .rejects.toThrow('Error al consultar la información. Código: 500');
+  });
+
+  it('maneja respuestas HTTP 200 sin contenido', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse(null)
+    ));
+
+    expect(await getMedicalEventById(1)).toBeNull();
+  });
+
+  it('rechaza identificadores negativos y decimales', async () => {
+    await expect(getMedicalEventById(-1))
+      .rejects.toThrow('El ID del evento médico no es válido.');
+
+    await expect(getMedicalEventById('1.5'))
+      .rejects.toThrow('El ID del evento médico no es válido.');
+  });
+
+  it('rechaza un ID nulo', async () => {
+    await expect(getMedicalEventById(null))
+      .rejects.toThrow('Debe ingresar el ID del evento médico.');
+  });
+});
