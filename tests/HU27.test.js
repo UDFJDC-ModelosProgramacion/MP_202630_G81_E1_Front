@@ -6,6 +6,8 @@ import {
   getNotifications,
   updateNotification,
   deleteNotification,
+  getPets,
+  getAdopters,
 } from '../src/workflows/HU27.js';
 
 const sampleNotifications = [
@@ -290,6 +292,226 @@ describe('HU27 - Gestionar notificaciones registradas', () => {
         .rejects.toThrow('El ID de la notificación es obligatorio.');
 
       expect(fetch).not.toHaveBeenCalled();
+    });
+  });
+}); 
+
+describe('HU27 - cobertura adicional', () => {
+  const validValues = {
+    tipo: 'Recordatorio',
+    mensaje: 'Mensaje de prueba',
+    fecha: '2026-10-20',
+    canal: 'EMAIL',
+  };
+
+  function mockResponse(data, status = 200) {
+    return {
+      ok: status >= 200 && status < 300,
+      status,
+      text: async () => data === null ? '' : JSON.stringify(data),
+      json: async () => data,
+    };
+  }
+
+  it('valida campos faltantes y valores nulos', () => {
+    const errors = validateNotification({
+      tipo: null,
+      mensaje: null,
+      fecha: null,
+      canal: null,
+    });
+
+    expect(errors.tipo).toBeDefined();
+    expect(errors.mensaje).toBeDefined();
+    expect(errors.fecha).toBeDefined();
+    expect(errors.canal).toBeDefined();
+  });
+
+  it('filtra usando identificadores alternativos', () => {
+    const notifications = [{
+      canal: 'EMAIL',
+      mascota: { mascotaId: 10 },
+      adoptante: { adoptanteId: 20 },
+    }];
+
+    expect(filterNotifications(notifications, {
+      canal: 'EMAIL',
+      mascotaId: '10',
+      adoptanteId: '20',
+    })).toHaveLength(1);
+  });
+
+  it('descarta notificaciones sin relaciones coincidentes', () => {
+    expect(filterNotifications([{
+      canal: 'SMS',
+      mascota: null,
+      adoptante: null,
+    }], {
+      canal: 'EMAIL',
+      mascotaId: '10',
+      adoptanteId: '20',
+    })).toEqual([]);
+  });
+
+  it('obtiene notificaciones desde data', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ data: sampleNotifications })
+    ));
+
+    expect(await getNotifications()).toHaveLength(3);
+  });
+
+  it('devuelve lista vacía si no hay notificaciones', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({})
+    ));
+
+    expect(await getNotifications()).toEqual([]);
+  });
+
+  it('devuelve lista vacía si la respuesta es nula', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse(null)
+    ));
+
+    expect(await getNotifications()).toEqual([]);
+  });
+
+  it('rechaza actualización sin ID', async () => {
+    await expect(updateNotification('', validValues, {}))
+      .rejects.toThrow('El ID de la notificación es obligatorio.');
+  });
+
+  it('obtiene mascotas como lista', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse([{ id: 1, nombre: 'Mora' }])
+    ));
+
+    expect(await getPets()).toHaveLength(1);
+  });
+
+  it('obtiene mascotas desde content', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ content: [{ id: 1 }] })
+    ));
+
+    expect(await getPets()).toHaveLength(1);
+  });
+
+  it('obtiene mascotas desde data', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ data: [{ id: 2 }] })
+    ));
+
+    expect(await getPets()).toHaveLength(1);
+  });
+
+  it('devuelve mascotas vacías si no hay datos', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse(null)
+    ));
+
+    expect(await getPets()).toEqual([]);
+  });
+
+  it('obtiene adoptantes como lista', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse([{ id: 1, nombre: 'Ana' }])
+    ));
+
+    expect(await getAdopters()).toHaveLength(1);
+  });
+
+  it('obtiene adoptantes desde content', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ content: [{ id: 1 }] })
+    ));
+
+    expect(await getAdopters()).toHaveLength(1);
+  });
+
+  it('obtiene adoptantes desde data', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ data: [{ id: 2 }] })
+    ));
+
+    expect(await getAdopters()).toHaveLength(1);
+  });
+
+  it('devuelve adoptantes vacíos si no hay datos', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse(null)
+    ));
+
+    expect(await getAdopters()).toEqual([]);
+  });
+
+  it('maneja respuesta HTTP 204', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+    }));
+
+    expect(await deleteNotification(1)).toBeNull();
+  });
+
+  it('maneja respuesta HTTP 200 sin contenido', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse(null)
+    ));
+
+    expect(await deleteNotification(1)).toBeNull();
+  });
+
+  it('muestra el mensaje de error del backend', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ message: 'Error personalizado' }, 400)
+    ));
+
+    await expect(deleteNotification(1))
+      .rejects.toThrow('Error personalizado');
+  });
+
+  it('usa error como mensaje alternativo', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ error: 'Error interno' }, 500)
+    ));
+
+    await expect(deleteNotification(1))
+      .rejects.toThrow('Error interno');
+  });
+
+  it('usa mensaje HTTP cuando no hay detalles', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({}, 500)
+    ));
+
+    await expect(deleteNotification(1))
+      .rejects.toThrow('Error HTTP 500');
+  });
+
+  it('maneja respuestas de error sin JSON válido', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: async () => {
+        throw new SyntaxError('JSON inválido');
+      },
+    }));
+
+    await expect(deleteNotification(1))
+      .rejects.toThrow('Error HTTP 500');
+  });
+
+  it('envía encabezado JSON al actualizar', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
+      mockResponse({ id: 1 })
+    ));
+
+    await updateNotification(1, validValues, { id: 1 });
+
+    expect(fetch.mock.calls[0][1].headers).toEqual({
+      'Content-Type': 'application/json',
     });
   });
 });
