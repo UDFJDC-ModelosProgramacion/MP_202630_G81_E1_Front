@@ -100,3 +100,6 @@ Página `HU30.html` para registrar y editar los datos de contacto de un refugio 
 - Mensajes de carga, éxito y error (incluidos los que devuelve el API), errores accesibles y uso completo con teclado.
 
 La lógica está en `src/workflows/HU30.js` (cobertura del 100 %), la interfaz en `src/pages/HU30.js` y las pruebas en `tests/HU30.test.js` y `e2e/HU30.spec.ts`. Las pruebas manuales de HU30 y HU33 están en [`docs/pruebas-manuales.md`](docs/pruebas-manuales.md).
+
+## Video
+https://www.youtube.com/watch?v=lZHhNKTwbAk
