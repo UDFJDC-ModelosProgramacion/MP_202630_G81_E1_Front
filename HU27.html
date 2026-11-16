@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HU27 - Gestionar notificaciones</title>
+  <link rel="stylesheet" href="./HU27.css">
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>Gestionar notificaciones registradas</h1>
+      <p>Consulta, filtra, edita o elimina notificaciones del sistema.</p>
+    </header>
+
+    <section class="panel">
+      <h2>Filtros</h2>
+
+      <div class="filters">
+        <label>
+          Canal
+          <select id="filter-channel">
+            <option value="">Todos los canales</option>
+            <option value="EMAIL">EMAIL</option>
+            <option value="SMS">SMS</option>
+            <option value="PUSH">PUSH</option>
+          </select>
+        </label>
+
+        <label>
+          Mascota
+          <select id="filter-pet">
+            <option value="">Todas las mascotas</option>
+          </select>
+        </label>
+
+        <label>
+          Adoptante
+          <select id="filter-adopter">
+            <option value="">Todos los adoptantes</option>
+          </select>
+        </label>
+
+        <button id="filter-button" type="button">Filtrar</button>
+        <button id="clear-filters" type="button" class="secondary">Limpiar</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <h2>Notificaciones registradas</h2>
+        <button id="reload-button" type="button" class="secondary">Actualizar</button>
+      </div>
+
+      <p id="feedback" role="status" aria-live="polite"></p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tipo</th>
+              <th>Mensaje</th>
+              <th>Fecha</th>
+              <th>Canal</th>
+              <th>Mascota</th>
+              <th>Adoptante</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="notifications-list">
+            <tr>
+              <td colspan="8">Cargando notificaciones...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="edit-panel" hidden>
+      <h2>Editar notificación</h2>
+
+      <form id="edit-form">
+        <input type="hidden" id="edit-id">
+
+        <label>
+          Tipo
+          <input id="edit-type" type="text" required maxlength="100">
+        </label>
+
+        <label>
+          Mensaje
+          <textarea id="edit-message" required maxlength="1000"></textarea>
+        </label>
+
+        <label>
+          Fecha
+          <input id="edit-date" type="date" required>
+        </label>
+
+        <label>
+          Canal
+          <select id="edit-channel" required>
+            <option value="">Seleccione un canal</option>
+            <option value="EMAIL">EMAIL</option>
+            <option value="SMS">SMS</option>
+            <option value="PUSH">PUSH</option>
+          </select>
+        </label>
+
+        <div class="form-actions">
+          <button type="submit">Guardar cambios</button>
+          <button id="cancel-edit" type="button" class="secondary">Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script type="module" src="./src/pages/HU27.js"></script>
+</body>
+</html>
