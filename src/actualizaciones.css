@@ -1,0 +1,115 @@
+
+.updates-page {
+  width: min(900px, 92%);
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+  color: #26352c;
+}
+
+.updates-header {
+  margin-bottom: 2rem;
+}
+
+.back-link {
+  color: #246b49;
+  text-decoration: none;
+}
+
+.eyebrow {
+  margin-top: 1.5rem;
+  color: #397b56;
+  font-weight: 700;
+}
+
+.updates-header h1 {
+  margin-bottom: 0.5rem;
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+}
+
+.updates-card {
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid #dce5de;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 5%);
+}
+
+.updates-card form {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.updates-card input,
+.updates-card select,
+.updates-card textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #b8c8bd;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.updates-card textarea {
+  resize: vertical;
+}
+
+.updates-card button {
+  margin-top: 0.8rem;
+  padding: 0.9rem 1rem;
+  border: 0;
+  border-radius: 8px;
+  background: #246b49;
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.updates-card button:hover {
+  background: #194d34;
+}
+
+.updates-card [aria-invalid="true"] {
+  border-color: #b42318;
+}
+
+.updates-card small {
+  color: #b42318;
+}
+
+#form-feedback {
+  margin-bottom: 0.5rem;
+  color: #b42318;
+}
+
+#success-message {
+  padding: 0.8rem;
+  border-radius: 8px;
+  background: #e8f5ec;
+  color: #205c37;
+}
+
+#updates-list {
+  display: grid;
+  gap: 1rem;
+  padding-left: 1.25rem;
+}
+
+#updates-list li {
+  padding: 1rem;
+  border: 1px solid #dce5de;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+#updates-list h3 {
+  margin-top: 0;
+}
+
+@media (max-width: 600px) {
+  .updates-card {
+    padding: 1rem;
+  }
+}

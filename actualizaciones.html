@@ -1,0 +1,87 @@
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Registro de actualizaciones de seguimiento de mascotas y adoptantes."
+    />
+    <title>Actualizaciones de seguimiento | Huellitas</title>
+  </head>
+  <body>
+    <main class="updates-page">
+      <header class="updates-header">
+        <a href="/" class="back-link">← Volver al inicio</a>
+        <p class="eyebrow">HU22 · Seguimiento</p>
+        <h1>Actualizaciones de seguimiento</h1>
+        <p>
+          Registra cambios importantes relacionados con una mascota
+          o un adoptante durante el proceso de adopción.
+        </p>
+      </header>
+
+      <section class="updates-card" aria-labelledby="form-title">
+        <h2 id="form-title">Registrar actualización</h2>
+
+        <div id="form-feedback" role="alert" aria-live="polite"></div>
+
+        <form id="update-form" novalidate>
+          <label for="target-type">¿A quién corresponde?</label>
+          <select id="target-type" name="targetType" required>
+            <option value="">Selecciona una opción</option>
+            <option value="mascota">Mascota</option>
+            <option value="adoptante">Adoptante</option>
+          </select>
+          <small id="target-type-error"></small>
+
+          <label for="target-id">Identificador de la mascota o adoptante</label>
+          <input
+            id="target-id"
+            name="targetId"
+            type="text"
+            required
+            maxlength="80"
+            placeholder="Ej. MASC-001"
+          />
+          <small id="target-id-error"></small>
+
+          <label for="title">Título de la actualización</label>
+          <input
+            id="title"
+            name="title"
+            type="text"
+            required
+            maxlength="100"
+            placeholder="Ej. Adaptación al nuevo entorno"
+          />
+          <small id="title-error"></small>
+
+          <label for="description">Descripción</label>
+          <textarea
+            id="description"
+            name="description"
+            rows="5"
+            maxlength="1000"
+            required
+            placeholder="Describe el cambio o situación relevante..."
+          ></textarea>
+          <small id="description-error"></small>
+
+          <button type="submit">Registrar actualización</button>
+        </form>
+
+        <p id="success-message" role="status" hidden></p>
+      </section>
+
+      <section class="updates-card" aria-labelledby="history-title">
+        <h2 id="history-title">Actualizaciones registradas en este navegador</h2>
+        <p id="empty-state">Todavía no hay actualizaciones registradas.</p>
+        <ul id="updates-list"></ul>
+      </section>
+    </main>
+
+    <script type="module" src="/src/actualizaciones.js"></script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+# Jenkins y SonarQube locales para verificar la calidad del proyecto
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    ports: ["8081:8080", "50000:50000"]
+    volumes: ["jenkins_home:/var/jenkins_home"]
+  sonarqube:
+    image: sonarqube:community
+    ports: ["9000:9000"]
+    volumes: ["sonar_data:/opt/sonarqube/data"]
+volumes:
+  jenkins_home:
+  sonar_data:

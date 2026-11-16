@@ -1,0 +1,200 @@
+.hu23-main {
+  padding-bottom: 35px;
+}
+
+.hu23-panel {
+  margin: 22px 0;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+}
+
+.hu23-heading {
+  margin-bottom: 22px;
+}
+
+.hu23-heading h2 {
+  margin: 5px 0 8px;
+  color: var(--green-dark);
+  font-size: 25px;
+  font-weight: 650;
+}
+
+.hu23-heading > p:last-child {
+  margin: 0;
+  color: #929990;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.hu23-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.hu23-field {
+  display: grid;
+  gap: 7px;
+}
+
+.hu23-field label {
+  color: var(--green-dark);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.hu23-field input,
+.hu23-field select {
+  width: 100%;
+  min-height: 43px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+  color: #39463d;
+  font: inherit;
+  font-size: 12px;
+}
+
+.hu23-field input:focus,
+.hu23-field select:focus {
+  border-color: var(--green);
+  outline: 2px solid rgba(83, 116, 86, 0.15);
+}
+
+.hu23-actions {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.hu23-actions .submit-button,
+.hu23-search .submit-button {
+  width: auto;
+  min-width: 150px;
+  margin: 0;
+}
+
+.hu23-actions .secondary-button {
+  min-height: 43px;
+  cursor: pointer;
+}
+
+.hu23-search {
+  display: flex;
+  align-items: end;
+  gap: 14px;
+}
+
+.hu23-search .hu23-field {
+  flex: 1;
+}
+
+#search-feedback {
+  min-height: 18px;
+  margin: 12px 0 0;
+  color: var(--green-dark);
+  font-size: 12px;
+}
+
+.hu23-results-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.hu23-count {
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: #f3f6ef;
+  color: var(--green-dark);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.hu23-empty {
+  padding: 24px;
+  border-radius: 8px;
+  background: #f8f8f5;
+  color: #929990;
+  font-size: 13px;
+  text-align: center;
+}
+
+.hu23-list {
+  display: grid;
+  gap: 13px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hu23-record {
+  padding: 19px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+}
+
+.hu23-record h3 {
+  margin: 9px 0;
+  color: var(--green-dark);
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.hu23-record p {
+  margin: 7px 0;
+  color: #69756d;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.hu23-record p:last-child {
+  color: #929990;
+  font-size: 10px;
+}
+
+.hu23-tag {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #f3f6ef;
+  color: var(--green-dark);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+@media (max-width: 680px) {
+  .hu23-panel {
+    padding: 20px;
+  }
+
+  .hu23-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .hu23-actions {
+    grid-column: auto;
+  }
+
+  .hu23-search {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .hu23-search .submit-button {
+    width: 100%;
+  }
+
+  .hu23-results-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+}

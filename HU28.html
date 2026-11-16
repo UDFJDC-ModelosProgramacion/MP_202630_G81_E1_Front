@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HU28 - Eventos médicos</title>
+  <link rel="stylesheet" href="./HU28.css">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Registro de eventos médicos</h1>
+      <p>Registra y actualiza la información médica de las mascotas.</p>
+    </header>
+
+    <section class="panel">
+      <h2>Registrar evento médico</h2>
+
+      <p id="feedback" role="status" aria-live="polite"></p>
+
+      <form id="event-form">
+        <label>
+          Mascota
+          <select id="pet" required>
+            <option value="">Seleccione una mascota</option>
+          </select>
+        </label>
+
+        <label>
+          Fecha
+          <input id="date" type="date" required>
+        </label>
+
+        <label>
+          Descripción
+          <textarea id="description" required maxlength="1000"></textarea>
+        </label>
+
+        <label>
+          Diagnóstico
+          <textarea id="diagnosis" required maxlength="1000"></textarea>
+        </label>
+
+        <label>
+          Tratamiento
+          <textarea id="treatment" required maxlength="1000"></textarea>
+        </label>
+
+        <button type="submit" id="save-button">Registrar evento</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <h2>Eventos médicos registrados</h2>
+        <button type="button" id="reload-button" class="secondary">
+          Actualizar
+        </button>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Mascota</th>
+              <th>Fecha</th>
+              <th>Descripción</th>
+              <th>Diagnóstico</th>
+              <th>Tratamiento</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="events-list">
+            <tr>
+              <td colspan="7">Cargando eventos médicos...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="edit-panel" hidden>
+      <h2>Editar evento médico</h2>
+
+      <form id="edit-form" novalidate>
+        <input type="hidden" id="edit-id">
+
+        <label>
+          Descripción
+          <textarea id="edit-description" required maxlength="1000"></textarea>
+        </label>
+
+        <label>
+          Diagnóstico
+          <textarea id="edit-diagnosis" required maxlength="1000"></textarea>
+        </label>
+
+        <label>
+          Tratamiento
+          <textarea id="edit-treatment" required maxlength="1000"></textarea>
+        </label>
+
+        <div class="form-actions">
+          <button type="submit">Guardar cambios</button>
+          <button type="button" id="cancel-edit" class="secondary">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script type="module" src="./src/pages/HU28.js"></script>
+</body>
+</html>

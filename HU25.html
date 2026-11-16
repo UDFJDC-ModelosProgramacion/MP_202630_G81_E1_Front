@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Consulta y filtra las reseñas de las mascotas." />
+    <title>HU25 - Consultar reseñas | AdoptaPet</title>
+  </head>
+  <body>
+    <header class="reviews-header">
+      <div class="reviews-container">
+        <a class="brand" href="/HU25.html">AdoptaPet</a>
+        <nav id="story-navigation" class="story-navigation"
+          aria-label="Navegación de historias"></nav>
+      </div>
+    </header>
+
+    <main class="reviews-container">
+      <section aria-labelledby="reviews-title">
+        <p class="eyebrow">OPINIONES DE NUESTRA COMUNIDAD</p>
+        <h1 id="reviews-title">Consultar reseñas</h1>
+        <p>Consulta las experiencias y opiniones sobre nuestras mascotas.</p>
+
+        <form id="review-filters">
+          <div class="field">
+            <label for="pet-id">ID de la mascota</label>
+            <input id="pet-id" type="number" min="1" placeholder="Ej. 1" />
+          </div>
+
+          <div class="field">
+            <label for="rating">Calificación</label>
+            <select id="rating">
+              <option value="">Todas las calificaciones</option>
+              <option value="5">5 estrellas</option>
+              <option value="4">4 estrellas</option>
+              <option value="3">3 estrellas</option>
+              <option value="2">2 estrellas</option>
+              <option value="1">1 estrella</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="adopter-id">ID del adoptante</label>
+            <input id="adopter-id" type="number" min="1" placeholder="Ej. 1" />
+          </div>
+
+          <button type="submit" id="search-reviews">Consultar</button>
+          <button type="button" id="clear-filters">Limpiar</button>
+        </form>
+
+        <div id="loading" role="status" hidden>Consultando reseñas...</div>
+        <div id="error" role="alert" hidden></div>
+        <div id="empty" role="status" hidden>
+          Esta mascota aún no tiene reseñas.
+        </div>
+
+        <p id="results-summary" aria-live="polite"></p>
+        <ul id="review-list" aria-label="Lista de reseñas"></ul>
+
+        <section aria-labelledby="single-review-title">
+          <h2 id="single-review-title">Consultar reseña por ID</h2>
+          <label for="review-id">ID de la reseña</label>
+          <input id="review-id" type="number" min="1" placeholder="Ej. 1" />
+          <button type="button" id="search-review-by-id">Buscar reseña</button>
+          <div id="single-review-result" aria-live="polite"></div>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="/src/pages/HU25.js"></script>
+  </body>
+</html>
