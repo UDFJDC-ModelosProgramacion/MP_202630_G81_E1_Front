@@ -141,7 +141,7 @@ describe('HU28 - Registrar eventos médicos', () => {
       await createMedicalEvent(values);
 
       expect(fetch).toHaveBeenCalledWith(
-        'http://localhost:8999/api/eventos-medicos',
+        'http://localhost:8080/api/eventos-medicos',
         expect.objectContaining({
           method: 'POST',
           body: expect.any(String),
@@ -201,7 +201,7 @@ describe('HU28 - Registrar eventos médicos', () => {
 
       expect(result).toHaveLength(1);
       expect(fetch).toHaveBeenCalledWith(
-        'http://localhost:8999/api/eventos-medicos',
+        'http://localhost:8080/api/eventos-medicos',
         expect.any(Object),
       );
     });
@@ -222,7 +222,7 @@ describe('HU28 - Registrar eventos médicos', () => {
       }, originalEvent);
 
       expect(fetch).toHaveBeenCalledWith(
-        'http://localhost:8999/api/eventos-medicos/1',
+        'http://localhost:8080/api/eventos-medicos/1',
         expect.objectContaining({
           method: 'PUT',
         }),

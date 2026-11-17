@@ -59,7 +59,7 @@ describe('HU29 - Consulta de historial médico', () => {
     expect(result).toHaveLength(1);
     expect(result[0].nombre).toBe('Mora');
     expect(fetch).toHaveBeenCalledWith(
-      'http://localhost:8999/api/mascotas',
+      'http://localhost:8080/api/mascotas',
     );
   });
 
@@ -114,7 +114,7 @@ describe('HU29 - Consulta de historial médico', () => {
 
     expect(result.id).toBe(1);
     expect(fetch).toHaveBeenCalledWith(
-      'http://localhost:8999/api/eventos-medicos/1',
+      'http://localhost:8080/api/eventos-medicos/1',
     );
   });
 

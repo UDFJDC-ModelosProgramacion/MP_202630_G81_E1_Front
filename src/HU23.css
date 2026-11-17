@@ -198,3 +198,87 @@
     flex-direction: column;
   }
 }
+
+.hu23-main {
+  padding-bottom: 35px;
+}
+
+.hu23-main .story-layout {
+  margin-top: 0;
+}
+
+.hu23-main .page-intro {
+  min-height: auto;
+  margin-top: 0;
+  padding: 28px 0 20px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+
+.hu23-main .page-intro h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 3.2vw, 40px);
+  font-weight: 500;
+  letter-spacing: -1px;
+}
+
+.hu23-main .intro-decoration {
+  display: none;
+}
+
+.hu23-main .hu23-panel {
+  margin: 20px 0;
+  padding: 24px;
+  border: 1px solid #eeede7;
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: 0 8px 28px rgba(51, 57, 45, 0.035);
+}
+
+.hu23-main .hu23-heading h2 {
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.hu23-main .hu23-filters {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.hu23-main .hu23-actions {
+  grid-column: 1 / -1;
+}
+
+/* Botones y registros */
+.hu23-main .hu23-record {
+  border-color: #e8ebe5;
+  background: #fff;
+}
+
+.hu23-main .hu23-record h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+}
+
+.hu23-main .hu23-count,
+.hu23-main .hu23-tag {
+  background: var(--green-pale);
+  color: var(--green-dark);
+}
+
+@media (max-width: 680px) {
+  .hu23-main .hu23-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .hu23-main .hu23-actions {
+    grid-column: auto;
+  }
+
+  .hu23-main .hu23-panel {
+    padding: 20px;
+  }
+}

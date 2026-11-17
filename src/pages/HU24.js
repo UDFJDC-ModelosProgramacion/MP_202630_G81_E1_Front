@@ -1,5 +1,7 @@
 import '../style.css'
 import '../HU24.css'
+import { renderStoryLinks } from '../story-navigation.js'
+import { renderStorySidebar } from '../story-sidebar.js'
 import {
   createReview,
   fetchAdopters,
@@ -74,100 +76,203 @@ function renderReviews() {
   container.innerHTML = reviews.map(renderReview).join('')
 }
 
+
 function renderPage() {
   app.innerHTML = `
-    <main class="hu24-main">
-      <header class="hu24-header">
-        <a href="./index.html" class="hu24-back">← Volver al inicio</a>
-        <p class="hu24-eyebrow">HUELLITAS · EXPERIENCIAS</p>
-        <h1>Reseñas de mascotas</h1>
-        <p>Comparte tu experiencia y ayuda a otras personas en su proceso de adopción.</p>
-      </header>
+    <header class="site-header mx-auto flex items-center justify-between">
+      <a class="brand" href="./HU01.html" aria-label="Huellitas, inicio">
+        <span class="brand-mark" aria-hidden="true">🐾</span>
+        <span>huellitas<span class="brand-dot">.</span></span>
+      </a>
 
-      <section class="hu24-panel" aria-labelledby="form-title">
-        <div class="hu24-section-heading">
-          <div>
-            <p class="hu24-eyebrow">TU EXPERIENCIA</p>
-            <h2 id="form-title">Publicar una reseña</h2>
-          </div>
+      <nav class="header-nav" id="primary-navigation" aria-label="Navegación principal">
+        ${renderStoryLinks('HU24')}
+      </nav>
+
+      <button class="menu-toggle" type="button"
+        aria-label="Abrir navegación"
+        aria-controls="primary-navigation"
+        aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </header>
+
+    <main class="mx-auto w-full hu24-main">
+      <div class="story-layout">
+        <div class="story-primary">
+
+          <header class="hu24-header">
+            <p class="eyebrow">
+              <span class="eyebrow-dot"></span>
+              HUELLITAS · EXPERIENCIAS
+            </p>
+            <h1>Reseñas de mascotas</h1>
+            <p>
+              Comparte tu experiencia y ayuda a otras personas
+              en su proceso de adopción.
+            </p>
+          </header>
+
+          <nav class="breadcrumb" aria-label="Ruta de navegación">
+            <a href="./HU01.html">Huellitas</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">HU24 · Reseñas</span>
+          </nav>
+
+          <section class="hu24-panel" aria-labelledby="form-title">
+            <div class="hu24-section-heading">
+              <div>
+                <p class="hu24-eyebrow">TU EXPERIENCIA</p>
+                <h2 id="form-title">Publicar una reseña</h2>
+              </div>
+            </div>
+
+            <form id="review-form" class="hu24-form">
+              <div class="hu24-field">
+                <label for="mascotaId">Mascota *</label>
+                <select id="mascotaId" name="mascotaId" required>
+                  ${renderOptions(pets, 'Selecciona una mascota')}
+                </select>
+                <small data-error="mascotaId"></small>
+              </div>
+
+              <div class="hu24-field">
+                <label for="adoptanteId">Adoptante (opcional)</label>
+                <select id="adoptanteId" name="adoptanteId">
+                  ${renderOptions(adopters, 'Sin adoptante asociado')}
+                </select>
+                <small data-error="adoptanteId"></small>
+              </div>
+
+              <div class="hu24-field">
+                <label for="calificacion">Calificación *</label>
+                <select id="calificacion" name="calificacion" required>
+                  <option value="">Selecciona una calificación</option>
+                  <option value="1">1 - Muy mala</option>
+                  <option value="2">2 - Mala</option>
+                  <option value="3">3 - Regular</option>
+                  <option value="4">4 - Buena</option>
+                  <option value="5">5 - Excelente</option>
+                </select>
+                <small data-error="calificacion"></small>
+              </div>
+
+              <div class="hu24-field">
+                <label for="fecha">Fecha *</label>
+                <input id="fecha" name="fecha" type="date"
+                  value="${today()}" required />
+                <small data-error="fecha"></small>
+              </div>
+
+              <div class="hu24-field hu24-field-wide">
+                <label for="comentario">Comentario *</label>
+                <textarea id="comentario" name="comentario"
+                  rows="4" maxlength="1000"
+                  placeholder="Cuéntanos cómo fue tu experiencia..."
+                  required></textarea>
+                <small data-error="comentario"></small>
+              </div>
+
+              <div id="form-message" class="hu24-message"
+                role="alert" hidden></div>
+
+              <div class="hu24-actions">
+                <button id="submit-review"
+                  class="hu24-primary-button" type="submit">
+                  Publicar reseña
+                </button>
+
+                <button id="cancel-edit"
+                  class="hu24-secondary-button"
+                  type="button" hidden>
+                  Cancelar edición
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section class="hu24-panel" aria-labelledby="reviews-title">
+            <div class="hu24-section-heading">
+              <div>
+                <p class="hu24-eyebrow">OPINIONES COMPARTIDAS</p>
+                <h2 id="reviews-title">Reseñas registradas</h2>
+              </div>
+
+              <span id="review-count" class="hu24-count"
+                role="status">0 reseñas</span>
+            </div>
+
+            <div id="review-list" class="hu24-review-list">
+              <p class="hu24-empty">Cargando reseñas...</p>
+            </div>
+          </section>
+
+          <div id="page-message" class="hu24-page-message"
+            role="alert" hidden></div>
+
         </div>
 
-        <form id="review-form" class="hu24-form">
-          <div class="hu24-field">
-            <label for="mascotaId">Mascota *</label>
-            <select id="mascotaId" name="mascotaId" required>
-              ${renderOptions(pets, 'Selecciona una mascota')}
-            </select>
-            <small data-error="mascotaId"></small>
-          </div>
-
-          <div class="hu24-field">
-            <label for="adoptanteId">Adoptante (opcional)</label>
-            <select id="adoptanteId" name="adoptanteId">
-              ${renderOptions(adopters, 'Sin adoptante asociado')}
-            </select>
-            <small data-error="adoptanteId"></small>
-          </div>
-
-          <div class="hu24-field">
-            <label for="calificacion">Calificación *</label>
-            <select id="calificacion" name="calificacion" required>
-              <option value="">Selecciona una calificación</option>
-              <option value="1">1 - Muy mala</option>
-              <option value="2">2 - Mala</option>
-              <option value="3">3 - Regular</option>
-              <option value="4">4 - Buena</option>
-              <option value="5">5 - Excelente</option>
-            </select>
-            <small data-error="calificacion"></small>
-          </div>
-
-          <div class="hu24-field">
-            <label for="fecha">Fecha *</label>
-            <input id="fecha" name="fecha" type="date" value="${today()}" required />
-            <small data-error="fecha"></small>
-          </div>
-
-          <div class="hu24-field hu24-field-wide">
-            <label for="comentario">Comentario *</label>
-            <textarea id="comentario" name="comentario" rows="4" maxlength="1000" placeholder="Cuéntanos cómo fue tu experiencia..." required></textarea>
-            <small data-error="comentario"></small>
-          </div>
-
-          <div id="form-message" class="hu24-message" role="alert" hidden></div>
-
-          <div class="hu24-actions">
-            <button id="submit-review" class="hu24-primary-button" type="submit">
-              Publicar reseña
-            </button>
-            <button id="cancel-edit" class="hu24-secondary-button" type="button" hidden>
-              Cancelar edición
-            </button>
-          </div>
-        </form>
-      </section>
-
-      <section class="hu24-panel" aria-labelledby="reviews-title">
-        <div class="hu24-section-heading">
-          <div>
-            <p class="hu24-eyebrow">OPINIONES COMPARTIDAS</p>
-            <h2 id="reviews-title">Reseñas registradas</h2>
-          </div>
-          <span id="review-count" class="hu24-count" role="status">0 reseñas</span>
-        </div>
-        <div id="review-list" class="hu24-review-list">
-          <p class="hu24-empty">Cargando reseñas...</p>
-        </div>
-      </section>
-
-      <div id="page-message" class="hu24-page-message" role="alert" hidden></div>
+        ${renderStorySidebar({
+          sidebarLabel: 'Información sobre reseñas',
+          petStatus: 'En adopción',
+          petEmoji: '🐕',
+          petTitle: 'Experiencias que inspiran',
+          petTag: 'HU24',
+          petSubtitle: 'Reseñas de mascotas',
+          asideDescription: 'Cada opinión ayuda a compartir experiencias y conocer mejor el proceso de adopción.',
+          helpTitle: 'Comparte tu experiencia',
+          helpDescription: 'Publica una reseña y ayuda a otras personas a conocer las historias de Huellitas.',
+          helpSteps: [
+            ['Selecciona una mascota', 'Escoge la mascota relacionada con tu experiencia.'],
+            ['Califica tu experiencia', 'Selecciona una puntuación del 1 al 5.'],
+            ['Publica tu opinión', 'Escribe tu comentario y guarda la reseña.'],
+          ],
+          helpLink: {
+            href: './HU01.html',
+            label: 'Explorar mascotas',
+          },
+          asideNote: 'Una opinión puede ayudar a encontrar un nuevo hogar.',
+        })}
+      </div>
     </main>
+
+    <footer class="site-footer mx-auto flex items-center justify-between">
+      <a class="brand footer-brand" href="./HU01.html">
+        <span class="brand-mark" aria-hidden="true">🐾</span>
+        <span>huellitas<span class="brand-dot">.</span></span>
+      </a>
+      <p>Con amor, cada historia encuentra su hogar.</p>
+      <span>© 2026 Huellitas</span>
+    </footer>
   `
 
-  document.querySelector('#review-form').addEventListener('submit', handleSubmit)
-  document.querySelector('#cancel-edit').addEventListener('click', cancelEdit)
-  document.querySelector('#review-list').addEventListener('click', handleReviewClick)
+  // Aqui conectamos los formularios con sus funciones originales.
+  document.querySelector('#review-form')
+    .addEventListener('submit', handleSubmit)
+
+  document.querySelector('#cancel-edit')
+    .addEventListener('click', cancelEdit)
+
+  document.querySelector('#review-list')
+    .addEventListener('click', handleReviewClick)
+
+  // Este boton abre y cierra el menu de todas las HU.
+  const menuToggle = document.querySelector('.menu-toggle')
+
+  menuToggle.addEventListener('click', () => {
+    const expanded = menuToggle.getAttribute('aria-expanded') === 'true'
+
+    menuToggle.setAttribute('aria-expanded', String(!expanded))
+    menuToggle.setAttribute(
+      'aria-label',
+      expanded ? 'Abrir navegación' : 'Cerrar navegación',
+    )
+
+    document.querySelector('.header-nav')
+      .classList.toggle('nav-open', !expanded)
+  })
 }
+
 
 function formValues() {
   const form = document.querySelector('#review-form')

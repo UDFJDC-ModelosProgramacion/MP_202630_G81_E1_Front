@@ -1,6 +1,7 @@
 import '../style.css'
-import '../../HU26.css'
+import '../HU26.css'
 import { renderStoryLinks } from '../story-navigation.js'
+import { renderStorySidebar } from '../story-sidebar.js'
 import {
   createNotification,
   fetchAdopters,
@@ -40,85 +41,277 @@ function renderOptions(items, placeholder) {
   ).join('')}`
 }
 
+
 function renderPage() {
   app.innerHTML = `
-    <main class="hu26-page">
-      <header class="hu26-header">
-        <div>
-          <p class="hu26-eyebrow">Huellitas · Administración</p>
-          <h1 class="hu26-title">Generar notificaciones</h1>
-          <p class="hu26-intro">Registra un aviso para informar sobre eventos importantes del proceso de adopción. Puedes dirigirlo a un adoptante o asociarlo únicamente con la mascota.</p>
+    <header class="site-header mx-auto flex items-center justify-between">
+      <a class="brand" href="./HU01.html" aria-label="Huellitas, inicio">
+        <span class="brand-mark" aria-hidden="true">🐾</span>
+        <span>huellitas<span class="brand-dot">.</span></span>
+      </a>
+
+      <nav
+        class="header-nav"
+        id="primary-navigation"
+        aria-label="Navegación principal"
+      >
+        ${renderStoryLinks('HU26')}
+      </nav>
+
+      <button
+        class="menu-toggle"
+        type="button"
+        aria-label="Abrir navegación"
+        aria-controls="primary-navigation"
+        aria-expanded="false"
+      >
+        <span></span><span></span>
+      </button>
+    </header>
+
+    <main class="mx-auto w-full hu26-page">
+      <div class="story-layout">
+        <div class="story-primary">
+
+          <header class="hu26-header">
+            <div>
+              <p class="eyebrow">
+                <span class="eyebrow-dot"></span>
+                HUELLITAS · ADMINISTRACIÓN
+              </p>
+              <h1 class="hu26-title">Generar notificaciones</h1>
+              <p class="hu26-intro">
+                Registra un aviso para informar sobre eventos importantes
+                del proceso de adopción. Puedes dirigirlo a un adoptante
+                o asociarlo únicamente con la mascota.
+              </p>
+            </div>
+          </header>
+
+          <nav class="breadcrumb" aria-label="Ruta de navegación">
+            <a href="./HU01.html">Huellitas</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">HU26 · Generar notificaciones</span>
+          </nav>
+
+          <section class="hu26-card" aria-labelledby="hu26-form-title">
+            <p class="hu26-eyebrow">CREACIÓN DE AVISOS</p>
+            <h2 id="hu26-form-title">Nueva notificación</h2>
+            <p class="hu26-card-description">
+              Los campos marcados con * son obligatorios.
+              La mascota debe existir en el sistema.
+            </p>
+
+            <div
+              id="hu26-message"
+              class="hu26-message"
+              role="status"
+              aria-live="polite"
+            ></div>
+
+            <form id="hu26-form" class="hu26-form" novalidate>
+              <div class="hu26-fields">
+
+                <div class="hu26-field">
+                  <label for="hu26-tipo">
+                    Tipo de notificación
+                    <span class="hu26-required">*</span>
+                  </label>
+                  <input
+                    id="hu26-tipo"
+                    name="tipo"
+                    maxlength="80"
+                    placeholder="Ej. Recordatorio de cita"
+                    required
+                  />
+                  <small class="hu26-error" data-error="tipo"></small>
+                </div>
+
+                <div class="hu26-field">
+                  <label for="hu26-canal">
+                    Canal <span class="hu26-required">*</span>
+                  </label>
+                  <select id="hu26-canal" name="canal" required>
+                    <option value="">Selecciona un canal</option>
+                    <option value="EMAIL">Correo electrónico</option>
+                    <option value="SMS">SMS</option>
+                    <option value="PUSH">Notificación push</option>
+                  </select>
+                  <small class="hu26-error" data-error="canal"></small>
+                </div>
+
+                <div class="hu26-field hu26-field-full">
+                  <label for="hu26-mensaje">
+                    Mensaje <span class="hu26-required">*</span>
+                  </label>
+                  <textarea
+                    id="hu26-mensaje"
+                    name="mensaje"
+                    maxlength="1000"
+                    placeholder="Escribe la información que recibirá el destinatario..."
+                    required
+                  ></textarea>
+                  <small class="hu26-error" data-error="mensaje"></small>
+                </div>
+
+                <div class="hu26-field">
+                  <label for="hu26-fecha">
+                    Fecha <span class="hu26-required">*</span>
+                  </label>
+                  <input
+                    id="hu26-fecha"
+                    name="fecha"
+                    type="date"
+                    required
+                  />
+                  <small class="hu26-error" data-error="fecha"></small>
+                </div>
+
+                <div class="hu26-field">
+                  <label for="hu26-mascota">
+                    Mascota <span class="hu26-required">*</span>
+                  </label>
+                  <select
+                    id="hu26-mascota"
+                    name="mascotaId"
+                    required
+                    disabled
+                  >
+                    <option value="">Cargando mascotas...</option>
+                  </select>
+                  <small class="hu26-error" data-error="mascotaId"></small>
+                </div>
+
+                <div class="hu26-field hu26-field-full">
+                  <label for="hu26-adoptante">
+                    Adoptante (opcional)
+                  </label>
+                  <select
+                    id="hu26-adoptante"
+                    name="adoptanteId"
+                    disabled
+                  >
+                    <option value="">Sin adoptante asociado</option>
+                  </select>
+                  <small class="hu26-hint">
+                    Si seleccionas un adoptante, debe estar registrado
+                    en el sistema.
+                  </small>
+                  <small class="hu26-error" data-error="adoptanteId"></small>
+                </div>
+              </div>
+
+              <div class="hu26-actions">
+                <button
+                  id="hu26-submit"
+                  class="hu26-button"
+                  type="submit"
+                >
+                  Registrar notificación
+                </button>
+
+                <button
+                  id="hu26-reset"
+                  class="hu26-button hu26-button-secondary"
+                  type="reset"
+                >
+                  Limpiar formulario
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section class="hu26-card hu26-channels">
+            <p class="hu26-eyebrow">MEDIOS DE COMUNICACIÓN</p>
+            <h2>Canales disponibles</h2>
+            <p class="hu26-card-description">
+              Elige cómo se debe comunicar el aviso.
+            </p>
+
+            <div class="hu26-side-list">
+              <div class="hu26-side-item">
+                <div class="hu26-side-icon">✉️</div>
+                <div>
+                  <strong>Correo electrónico</strong>
+                  <span>Canal EMAIL para enviar información por correo.</span>
+                </div>
+              </div>
+
+              <div class="hu26-side-item">
+                <div class="hu26-side-icon">💬</div>
+                <div>
+                  <strong>Mensaje SMS</strong>
+                  <span>Canal SMS para avisos mediante mensaje de texto.</span>
+                </div>
+              </div>
+
+              <div class="hu26-side-item">
+                <div class="hu26-side-icon">🔔</div>
+                <div>
+                  <strong>Notificación push</strong>
+                  <span>Canal PUSH para avisos dentro de una aplicación.</span>
+                </div>
+              </div>
+            </div>
+
+            <p class="hu26-hint hu26-channel-note">
+              La notificación se registra en el backend.
+              Esta pantalla no simula el envío real por correo,
+              SMS o push.
+            </p>
+          </section>
         </div>
-      </header>
-      <nav aria-label="Navegación de historias de usuario">${renderStoryLinks('HU26')}</nav>
-      <div class="hu26-layout">
-        <section class="hu26-card" aria-labelledby="hu26-form-title">
-          <h2 id="hu26-form-title">Nueva notificación</h2>
-          <p class="hu26-card-description">Los campos marcados con * son obligatorios. La mascota debe existir en el sistema.</p>
-          <div id="hu26-message" class="hu26-message" role="status" aria-live="polite"></div>
-          <form id="hu26-form" class="hu26-form" novalidate>
-            <div class="hu26-fields">
-              <div class="hu26-field">
-                <label for="hu26-tipo">Tipo de notificación <span class="hu26-required">*</span></label>
-                <input id="hu26-tipo" name="tipo" maxlength="80" placeholder="Ej. Recordatorio de cita" required />
-                <small class="hu26-error" data-error="tipo"></small>
-              </div>
-              <div class="hu26-field">
-                <label for="hu26-canal">Canal <span class="hu26-required">*</span></label>
-                <select id="hu26-canal" name="canal" required>
-                  <option value="">Selecciona un canal</option>
-                  <option value="EMAIL">Correo electrónico</option>
-                  <option value="SMS">SMS</option>
-                  <option value="PUSH">Notificación push</option>
-                </select>
-                <small class="hu26-error" data-error="canal"></small>
-              </div>
-              <div class="hu26-field hu26-field-full">
-                <label for="hu26-mensaje">Mensaje <span class="hu26-required">*</span></label>
-                <textarea id="hu26-mensaje" name="mensaje" maxlength="1000" placeholder="Escribe la información que recibirá el destinatario..." required></textarea>
-                <small class="hu26-error" data-error="mensaje"></small>
-              </div>
-              <div class="hu26-field">
-                <label for="hu26-fecha">Fecha <span class="hu26-required">*</span></label>
-                <input id="hu26-fecha" name="fecha" type="date" required />
-                <small class="hu26-error" data-error="fecha"></small>
-              </div>
-              <div class="hu26-field">
-                <label for="hu26-mascota">Mascota <span class="hu26-required">*</span></label>
-                <select id="hu26-mascota" name="mascotaId" required disabled>
-                  <option value="">Cargando mascotas...</option>
-                </select>
-                <small class="hu26-error" data-error="mascotaId"></small>
-              </div>
-              <div class="hu26-field hu26-field-full">
-                <label for="hu26-adoptante">Adoptante (opcional)</label>
-                <select id="hu26-adoptante" name="adoptanteId" disabled>
-                  <option value="">Sin adoptante asociado</option>
-                </select>
-                <small class="hu26-hint">Si seleccionas un adoptante, debe estar registrado en el sistema.</small>
-                <small class="hu26-error" data-error="adoptanteId"></small>
-              </div>
-            </div>
-            <div class="hu26-actions">
-              <button id="hu26-submit" class="hu26-button" type="submit">Registrar notificación</button>
-              <button id="hu26-reset" class="hu26-button hu26-button-secondary" type="reset">Limpiar formulario</button>
-            </div>
-          </form>
-        </section>
-        <aside class="hu26-card">
-          <h2>Canales disponibles</h2>
-          <p class="hu26-card-description">Elige cómo se debe comunicar el aviso.</p>
-          <div class="hu26-side-list">
-            <div class="hu26-side-item"><div class="hu26-side-icon">✉️</div><div><strong>Correo electrónico</strong><span>Canal EMAIL para enviar información por correo.</span></div></div>
-            <div class="hu26-side-item"><div class="hu26-side-icon">💬</div><div><strong>Mensaje SMS</strong><span>Canal SMS para avisos mediante mensaje de texto.</span></div></div>
-            <div class="hu26-side-item"><div class="hu26-side-icon">🔔</div><div><strong>Notificación push</strong><span>Canal PUSH para avisos dentro de una aplicación.</span></div></div>
-          </div>
-          <p class="hu26-hint" style="margin-top:18px">La notificación se registra en el backend. Esta pantalla no simula el envío real por correo, SMS o push.</p>
-        </aside>
+
+        ${renderStorySidebar({
+          sidebarLabel: 'Información sobre notificaciones',
+          petStatus: 'En adopción',
+          petEmoji: '🐶',
+          petTitle: 'Siempre conectados',
+          petTag: 'HU26',
+          petSubtitle: 'Avisos de adopción',
+          asideDescription: 'Mantén informada a la comunidad sobre novedades importantes relacionadas con las mascotas.',
+          helpTitle: 'Genera una notificación',
+          helpDescription: 'Registra avisos relacionados con las mascotas y sus procesos de adopción.',
+          helpSteps: [
+            ['Selecciona el canal', 'Escoge correo, SMS o notificación push.'],
+            ['Escribe el mensaje', 'Indica la información que quieres comunicar.'],
+            ['Registra el aviso', 'Selecciona la mascota y guarda la notificación.'],
+          ],
+          helpLink: {
+            href: './HU01.html',
+            label: 'Explorar mascotas',
+          },
+          asideNote: 'Mantener informadas a las familias también es parte del cuidado.',
+        })}
       </div>
     </main>
+
+    <footer class="site-footer mx-auto flex items-center justify-between">
+      <a class="brand footer-brand" href="./HU01.html">
+        <span class="brand-mark" aria-hidden="true">🐾</span>
+        <span>huellitas<span class="brand-dot">.</span></span>
+      </a>
+      <p>Con amor, cada historia encuentra su hogar.</p>
+      <span>© 2026 Huellitas</span>
+    </footer>
   `
+
+  const menuToggle = document.querySelector('.menu-toggle')
+
+  menuToggle.addEventListener('click', () => {
+    const expanded = menuToggle.getAttribute('aria-expanded') === 'true'
+
+    menuToggle.setAttribute('aria-expanded', String(!expanded))
+    menuToggle.setAttribute(
+      'aria-label',
+      expanded ? 'Abrir navegación' : 'Cerrar navegación',
+    )
+
+    document.querySelector('.header-nav')
+      .classList.toggle('nav-open', !expanded)
+  })
 }
+
 
 function formValues(form) {
   const data = new FormData(form)

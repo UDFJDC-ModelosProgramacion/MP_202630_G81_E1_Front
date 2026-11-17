@@ -1,84 +1,190 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HU29 - Historial médico</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Consulta el historial médico de las mascotas en Huellitas."
+  />
+  <title>HU29 · Historial médico | Huellitas</title>
 </head>
+
 <body>
-  <main class="container">
-    <header>
-      <h1>Historial médico de mascotas</h1>
-      <p>Consulta los eventos médicos registrados para conocer el estado de salud de una mascota.</p>
-    </header>
+  <header class="site-header mx-auto flex items-center justify-between">
+    <a class="brand" href="./HU01.html" aria-label="Huellitas, inicio">
+      <span class="brand-mark" aria-hidden="true">🐾</span>
+      <span>huellitas<span class="brand-dot">.</span></span>
+    </a>
 
-    <section class="panel">
-      <h2>Consultar historial</h2>
+    <nav
+      class="header-nav"
+      id="primary-navigation"
+      aria-label="Navegación principal"
+    ></nav>
 
-      <p id="feedback" role="status" aria-live="polite"></p>
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-label="Abrir navegación"
+      aria-controls="primary-navigation"
+      aria-expanded="false"
+    >
+      <span></span>
+      <span></span>
+    </button>
+  </header>
 
-      <label for="pet">Seleccionar mascota</label>
-      <select id="pet">
-        <option value="">Seleccione una mascota</option>
-      </select>
+  <main class="mx-auto w-full hu29-main">
+    <div class="story-layout">
+      <div class="story-primary">
 
-      <label for="diagnosis-filter">Filtrar por diagnóstico</label>
-      <input
-        type="search"
-        id="diagnosis-filter"
-        placeholder="Escriba un diagnóstico..."
-      >
+        <header class="hu29-intro">
+          <p class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            HUELLITAS · SALUD Y BIENESTAR
+          </p>
 
-      <button type="button" id="search-button">
-        Consultar historial
-      </button>
+          <h1>Historial médico de mascotas</h1>
 
-      <button type="button" id="clear-filter" class="secondary">
-        Limpiar filtro
-      </button>
-    </section>
+          <p>
+            Consulta los eventos médicos registrados para conocer
+            el estado de salud y los tratamientos de cada mascota.
+          </p>
+        </header>
 
-    <section class="panel">
-      <h2>Eventos médicos</h2>
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
+          <a href="./HU01.html">Huellitas</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">HU29 · Historial médico</span>
+        </nav>
 
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Fecha</th>
-              <th>Descripción</th>
-              <th>Diagnóstico</th>
-              <th>Tratamiento</th>
-            </tr>
-          </thead>
-          <tbody id="events-list">
-            <tr>
-              <td colspan="5">Seleccione una mascota para consultar su historial.</td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- Aqui seleccionamos la mascota y filtramos su historial -->
+        <section class="hu29-panel" aria-labelledby="hu29-search-title">
+          <div class="hu29-section-heading">
+            <p class="hu29-eyebrow">CONSULTA DE SALUD</p>
+            <h2 id="hu29-search-title">Consultar historial</h2>
+            <p>
+              Selecciona una mascota y, si lo necesitas,
+              escribe un diagnóstico para filtrar sus eventos médicos.
+            </p>
+          </div>
+
+          <p id="feedback" role="status" aria-live="polite"></p>
+
+          <div class="hu29-filters">
+            <label for="pet">
+              Seleccionar mascota
+              <select id="pet">
+                <option value="">Seleccione una mascota</option>
+              </select>
+            </label>
+
+            <label for="diagnosis-filter">
+              Filtrar por diagnóstico
+              <input
+                type="search"
+                id="diagnosis-filter"
+                placeholder="Escriba un diagnóstico..."
+              />
+            </label>
+          </div>
+
+          <div class="hu29-actions">
+            <button type="button" id="search-button">
+              Consultar historial
+            </button>
+
+            <button
+              type="button"
+              id="clear-filter"
+              class="secondary"
+            >
+              Limpiar filtro
+            </button>
+          </div>
+        </section>
+
+        <!-- Aqui mostramos los eventos medicos de la mascota -->
+        <section class="hu29-panel" aria-labelledby="hu29-events-title">
+          <div class="hu29-section-heading">
+            <p class="hu29-eyebrow">REGISTROS MÉDICOS</p>
+            <h2 id="hu29-events-title">Eventos médicos</h2>
+            <p>
+              Revisa las fechas, diagnósticos y tratamientos
+              registrados para la mascota seleccionada.
+            </p>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Fecha</th>
+                  <th>Descripción</th>
+                  <th>Diagnóstico</th>
+                  <th>Tratamiento</th>
+                </tr>
+              </thead>
+
+              <tbody id="events-list">
+                <tr>
+                  <td colspan="5">
+                    Seleccione una mascota para consultar su historial.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Esta parte permite buscar un evento usando su ID -->
+        <section class="hu29-panel" aria-labelledby="hu29-detail-title">
+          <div class="hu29-section-heading">
+            <p class="hu29-eyebrow">BÚSQUEDA INDIVIDUAL</p>
+            <h2 id="hu29-detail-title">Consultar evento médico por ID</h2>
+            <p>
+              Si conoces el identificador de un evento médico,
+              puedes buscarlo directamente.
+            </p>
+          </div>
+
+          <div class="hu29-id-search">
+            <label for="event-id">
+              ID del evento médico
+              <input
+                type="number"
+                id="event-id"
+                min="1"
+                placeholder="Ingrese el ID del evento"
+              />
+            </label>
+
+            <button type="button" id="search-event-button">
+              Buscar evento
+            </button>
+          </div>
+
+          <div id="event-detail" aria-live="polite"></div>
+        </section>
+
       </div>
-    </section>
 
-    <section class="panel">
-      <h2>Consultar evento médico por ID</h2>
-
-      <label for="event-id">ID del evento médico</label>
-      <input
-        type="number"
-        id="event-id"
-        min="1"
-        placeholder="Ingrese el ID del evento"
-      >
-
-      <button type="button" id="search-event-button">
-        Buscar evento
-      </button>
-
-      <div id="event-detail" aria-live="polite"></div>
-    </section>
+      <div id="hu29-sidebar"></div>
+    </div>
   </main>
+
+  <footer class="site-footer mx-auto flex items-center justify-between">
+    <a class="brand footer-brand" href="./HU01.html">
+      <span class="brand-mark" aria-hidden="true">🐾</span>
+      <span>huellitas<span class="brand-dot">.</span></span>
+    </a>
+
+    <p>Con amor, cada historia encuentra su hogar.</p>
+    <span>© 2026 Huellitas</span>
+  </footer>
 
   <script type="module" src="./src/pages/HU29.js"></script>
 </body>

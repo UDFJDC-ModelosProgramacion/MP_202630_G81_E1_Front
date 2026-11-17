@@ -175,7 +175,7 @@ describe('HU27 - Gestionar notificaciones registradas', () => {
 
       expect(result).toHaveLength(3);
       expect(fetch).toHaveBeenCalledWith(
-        'http://localhost:8999/api/notificaciones',
+        'http://localhost:8080/api/notificaciones',
         expect.any(Object),
       );
     });
@@ -213,7 +213,7 @@ describe('HU27 - Gestionar notificaciones registradas', () => {
       await updateNotification(1, values, sampleNotifications[0]);
 
       expect(fetch).toHaveBeenCalledWith(
-        'http://localhost:8999/api/notificaciones/1',
+        'http://localhost:8080/api/notificaciones/1',
         expect.objectContaining({
           method: 'PUT',
           body: expect.any(String),
@@ -269,7 +269,7 @@ describe('HU27 - Gestionar notificaciones registradas', () => {
       await deleteNotification(1);
 
       expect(fetch).toHaveBeenCalledWith(
-        'http://localhost:8999/api/notificaciones/1',
+        'http://localhost:8080/api/notificaciones/1',
         expect.objectContaining({
           method: 'DELETE',
         }),
