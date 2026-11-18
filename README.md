@@ -2,7 +2,7 @@
 
 Interfaz frontend para las historias HU01–HU17, HU18–HU21, HU30–HU35. Cada historia tiene una página separada y comparte el estilo visual de Huellitas.
 
-Los datos de HU01–HU08 y HU18–HU21 se guardan en `localStorage` como demostración; no se conectan a un backend. HU01 presenta la galería fotográfica y HU30–HU35 (refugios, mascotas, veterinarios y seguimientos) consumen el API del back-end, que se espera en `http://localhost:8080/api`; si corre en otra dirección, crear un archivo `.env.local` con `VITE_API_URL=http://servidor:puerto/api`.
+Los datos de HU01–HU08 y HU18–HU21 se guardan en `localStorage` como demostración; no se conectan a un backend. HU01 presenta la galería fotográfica y HU30–HU35 (refugios, mascotas, veterinarios y seguimientos) consumen el API del back-end, que se espera en `http://localhost:8999/api`; si corre en otra dirección, crear un archivo `.env.local` con `VITE_API_URL=http://servidor:puerto/api`.
 
 ## Tecnologías
 
@@ -78,7 +78,7 @@ La lógica está en `src/catalog/catalog.js`, que usa el cliente compartido `src
 
 ### Cómo ejecutar HU33
 
-1. Levantar el back-end (`mvnw.cmd spring-boot:run` o `java -jar`). Por defecto responde en `http://localhost:8080/api`.
+1. Levantar el back-end (`mvnw.cmd spring-boot:run` o `java -jar`). Por defecto responde en `http://localhost:8999/api` (puerto fijado en el `pom.xml`).
 2. En este repo:
 
 ```sh

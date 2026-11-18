@@ -2,7 +2,7 @@
 // También la usan HU30, HU31, HU32, HU34 y HU35 (URL del API, normalización de mascotas y escapeHtml).
 import { expectList, expectObject, parseIdParam, requestJson, text } from '../api-client.js'
 
-export const DEFAULT_API_URL = 'http://localhost:8080/api'
+export const DEFAULT_API_URL = 'http://localhost:8999/api'
 
 export const PET_STATES = ['Disponible', 'En proceso de adopcion', 'Adoptado']
 
