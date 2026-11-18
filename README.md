@@ -1,8 +1,8 @@
 # Huellitas — solicitudes de adopción
 
-Interfaz frontend para las historias HU01–HU17, HU18–HU21, HU30 y HU33. Cada historia tiene una página separada y comparte el estilo visual de Huellitas.
+Interfaz frontend para las historias HU01–HU05, HU18–HU21 y HU30–HU35. Cada historia tiene una página separada y comparte el estilo visual de Huellitas.
 
-Los datos de HU01–HU08 y HU18–HU21 se guardan en `localStorage` como demostración; no se conectan a un backend. HU01 presenta la galería fotográfica y HU33 conserva la integración del catálogo con el API.
+Los datos de HU01–HU05 y HU18–HU21 se guardan en `localStorage` como demostración; no se conectan a un backend. HU01 presenta la galería fotográfica; HU30–HU35 (refugios, mascotas, veterinarios y seguimientos) consumen el API del back-end. El API se espera en `http://localhost:8080/api`; si corre en otra dirección, crear un archivo `.env.local` con `VITE_API_URL=http://servidor:puerto/api`.
 
 ## Tecnologías
 
@@ -52,23 +52,17 @@ Página `HU04.html` que combina eventos y registros de adopción/devolución, lo
 
 Página `HU05.html` para crear, editar y eliminar historias con título y descripción. Solo permite publicar o editar historias cuyo registro de mascota no esté marcado como inactivo o retirado.
 
-## HU06 — Consultar historias de éxito
-
-Página `HU06.html` para consultar los relatos publicados de una mascota. Muestra título, descripción y fecha, además de estados para mascotas inexistentes o inactivas y mascotas sin historias.
-
-## HU07 — Enviar y recibir mensajes
-
-Página `HU07.html` para consultar la bandeja del adoptante y enviar mensajes asociados a una mascota. Permite editar o eliminar mensajes propios no leídos; los registros de demostración se asocian al adoptante Samuel.
-
-## HU08 — Organizar mensajes
-
-Página `HU08.html` para marcar mensajes propios como leídos o no leídos, individualmente o en grupo. No permite organizar mensajes de otro adoptante ni eliminar un mensaje ya leído.
-
 ## HU33 — Catálogo de mascotas
 
-Página `HU33.html` que consulta `GET {API}/mascotas` del back-end y muestra las mascotas en tarjetas (nombre, especie, raza, edad, sexo, tamaño, estado y refugio). Incluye búsqueda por nombre o raza, filtros por especie y estado, mensajes de carga, error (con botón **Reintentar**) y un mensaje cuando no hay mascotas disponibles.
+Página `HU33.html` (código en `src/pages/HU33.js`, con la misma cabecera, navegación y panel lateral que las demás historias) que consulta `GET {API}/mascotas` del back-end y muestra las mascotas en tarjetas (nombre, especie, raza, edad, sexo, tamaño, estado y refugio). Incluye búsqueda por nombre o raza, filtros por especie y estado, mensajes de carga, error (con botón **Reintentar**) y un mensaje cuando no hay mascotas disponibles.
 
-Cada tarjeta tiene un botón **Ver detalle** que abre `HU33.html?id={id}`, donde se consulta `GET {API}/mascotas/{id}` y se muestran todos los datos de la mascota. Si el id no existe se muestra «La mascota no fue encontrada.».
+- La lista de especies no repite valores escritos con distinta mayúscula o tilde («Perro» y «perro» salen una sola vez y el filtro agrupa ambos), porque HU32 recibe la especie como texto libre.
+- Mientras el catálogo carga, o si la carga falló, usar los filtros no reemplaza el mensaje de carga o de error.
+- Una mascota sin estado ya no se muestra como «Disponible»; aparece como «Estado no registrado».
+
+Cada tarjeta tiene un botón **Ver detalle** que abre `HU33.html?id={id}`, donde se consulta `GET {API}/mascotas/{id}` y se muestran todos los datos de la mascota, con un enlace al refugio (`HU31.html?id={refugio}`). Si el id no existe se muestra «La mascota no fue encontrada.».
+
+La lógica está en `src/catalog/catalog.js`, que usa el cliente compartido `src/api-client.js` (por eso también muestra el mensaje que devuelve el API cuando rechaza una petición). Los estilos de tarjetas, estados y mensajes están en `src/catalog/catalog.css`, que también cargan HU31 y HU34 porque reutilizan esas clases.
 
 ### Cómo ejecutar HU33
 
@@ -99,4 +93,46 @@ Página `HU30.html` para registrar y editar los datos de contacto de un refugio 
 - **Editar:** abrir `http://localhost:5173/HU30.html?id=1` (o escribir el número en «Editar un refugio existente»). Se carga el refugio con `GET {API}/refugios/{id}` y se guarda con `PUT {API}/refugios/{id}`. Si el id no existe se muestra «El refugio no fue encontrado.».
 - Mensajes de carga, éxito y error (incluidos los que devuelve el API), errores accesibles y uso completo con teclado.
 
-La lógica está en `src/workflows/HU30.js` (cobertura del 100 %), la interfaz en `src/pages/HU30.js` y las pruebas en `tests/HU30.test.js` y `e2e/HU30.spec.ts`. Las pruebas manuales de HU30 y HU33 están en [`docs/pruebas-manuales.md`](docs/pruebas-manuales.md).
+La lógica está en `src/workflows/HU30.js` (cobertura del 100 %), la interfaz en `src/pages/HU30.js` y las pruebas en `tests/HU30.test.js` y `e2e/HU30.spec.ts`. Las pruebas manuales de HU30–HU35 están en [`docs/pruebas-manuales.md`](docs/pruebas-manuales.md).
+
+## HU31 — Detalle de un refugio
+
+Página `HU31.html`: escribir el número de un refugio (o abrir `http://localhost:5173/HU31.html?id=1`) para consultar `GET {API}/refugios/{id}`. Muestra nombre, ciudad, dirección, teléfono y correo, y la lista de mascotas registradas en ese refugio, cada una con un enlace a su detalle (`HU33.html?id=`). Si el refugio no tiene mascotas muestra «Este refugio no tiene mascotas registradas.»; si no existe muestra «El refugio no fue encontrado.».
+
+## HU32 — Registrar una mascota
+
+Página `HU32.html` con el formulario de registro (`POST {API}/mascotas`): nombre y especie obligatorios, edad no negativa, estado entre «Disponible», «En proceso de adopcion» y «Adoptado», y refugio opcional (si se indica, debe existir). También permite eliminar una mascota por su número (`DELETE {API}/mascotas/{id}`); si la mascota tiene seguimientos veterinarios se muestra el error que devuelve el API.
+
+## HU34 — Registrar veterinarios de un refugio
+
+Página `HU34.html`: formulario de registro (`POST {API}/veterinarios`) con nombre, teléfono, correo, especialidad, disponibilidad y el número del refugio al que queda asociado (si no existe se muestra un error). Muestra el listado de veterinarios registrados (`GET {API}/veterinarios`) y permite consultar uno por su número (`GET {API}/veterinarios/{id}`), con el mensaje «El veterinario no fue encontrado.» si no existe.
+
+## HU35 — Programar y consultar seguimientos veterinarios
+
+Página `HU35.html`: formulario para programar un seguimiento (`POST {API}/seguimientos`) con fecha de asignación obligatoria, próxima cita (no puede ser anterior a la asignación), observación, estado y los números de la mascota y del veterinario, que deben existir. Permite consultar los seguimientos de una mascota por su número, editarlos (`PUT`) y eliminarlos (`DELETE`); un seguimiento «Completado» no se puede modificar ni eliminar.
+
+La lógica compartida del API está en `src/api-client.js` (cobertura del 100 %) y las utilidades de formularios en `src/admin-ui.js`. Cada historia tiene su lógica en `src/workflows/HUxx.js`, su página en `src/pages/HUxx.js`, y sus pruebas en `tests/HUxx.test.js` y `e2e/HUxx.spec.ts`.
+
+## HU09 — Registrar adoptante
+
+Formulario para que una persona se registre como adoptante. Envía los datos (nombre, correo, teléfono, ciudad y dirección) al backend con `POST /api/adoptantes`, muestra los errores de validación del formulario y los que devuelve la API (por ejemplo, un correo ya registrado) y, al terminar, confirma el registro y guarda el número de adoptante en el navegador.
+
+### Cómo ejecutarla
+
+1. Levanta el backend (`MP_202630_G81_E1_Back`) en `http://localhost:8080`. La URL base de la API está en `src/adoptante.js` (`API_BASE_URL`).
+2. En este repositorio:
+
+```sh
+npm install
+npm run dev
+```
+
+3. Abre `http://localhost:5173/HU09.html` (también está el enlace «Registro» en la navegación de la página).
+
+### Pruebas
+
+```sh
+npm run test:unit
+```
+
+La lógica de HU09 está en `src/adoptante.js` y sus pruebas en `tests/adoptante.test.js` (cobertura del 100 %). La interfaz está en `registro-adoptante.html` y `src/registro-adoptante.js`.
