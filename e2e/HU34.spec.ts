@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 
 const cors = { 'access-control-allow-origin': '*' }
 const json = (status: number, body: unknown) => ({ status, contentType: 'application/json', headers: cors, body: JSON.stringify(body) })
-const ana = { id: 4, nombre: 'Dra. Ana Ruiz', telefono: '3001112233', correo: 'ana@vet.co', especialidad: 'Medicina general', disponibilidad: 'Lunes a viernes', refugio: { id: 7, nombre: 'Huellitas' } }
+const ana = { id: 4, nombre: 'Dra. Ana Ruiz', telefono: '3001112233', email: 'ana@vet.co', especialidad: 'Medicina general', disponibilidad: 'Lunes a viernes', refugio: { id: 7, nombre: 'Huellitas' } }
 const datos: Record<string, string> = { nombre: 'Dra. Ana Ruiz', telefono: '3001112233', correo: 'ana@vet.co', especialidad: 'Medicina general', disponibilidad: 'Lunes a viernes', refugioId: '7' }
 
 async function fillVet(page: Page, values = datos) {
@@ -44,7 +44,7 @@ test('registers a veterinarian associated with a shelter and refreshes the list'
 
   await expect(page.getByText('Veterinario «Dra. Ana Ruiz» registrado correctamente.')).toBeVisible()
   expect(sent).toEqual({
-    nombre: 'Dra. Ana Ruiz', telefono: '3001112233', correo: 'ana@vet.co', especialidad: 'Medicina general',
+    nombre: 'Dra. Ana Ruiz', telefono: '3001112233', email: 'ana@vet.co', especialidad: 'Medicina general',
     disponibilidad: 'Lunes a viernes', refugio: { id: 7 },
   })
   await expect(page.getByTestId('vet-item')).toHaveCount(1)

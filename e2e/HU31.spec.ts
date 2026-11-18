@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 
 const cors = { 'access-control-allow-origin': '*' }
 const json = (status: number, body: unknown) => ({ status, contentType: 'application/json', headers: cors, body: JSON.stringify(body) })
-const refugio = { id: 7, nombre: 'Huellitas', ciudad: 'Bogotá', direccion: 'Calle 1 # 2-3', telefono: '3001234567', correo: 'h@refugio.co', descripcion: 'Refugio de perros' }
+const refugio = { id: 7, nombre: 'Huellitas', ciudad: 'Bogotá', direccion: 'Calle 1 # 2-3', telefono: '3001234567', email: 'h@refugio.co', descripcion: 'Refugio de perros' }
 const mora = { id: 1, nombre: 'Mora', especie: 'Perro', raza: 'Criollo', edad: 3, estado: 'Disponible', refugio: { id: 7, nombre: 'Huellitas' } }
 const felix = { id: 2, nombre: 'Félix', especie: 'Gato', edad: 1, estado: 'Adoptado', refugio: { id: 9, nombre: 'Otro' } }
 

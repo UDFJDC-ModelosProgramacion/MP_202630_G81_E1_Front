@@ -45,7 +45,7 @@ describe('validateVet', () => {
 describe('buildVetPayload', () => {
   it('associates the veterinarian with a shelter', () => {
     expect(buildVetPayload({ ...values, nombre: ' Dra. Ana Ruiz ' })).toEqual({
-      nombre: 'Dra. Ana Ruiz', telefono: '3001112233', correo: 'ana@vet.co', especialidad: 'Medicina general',
+      nombre: 'Dra. Ana Ruiz', telefono: '3001112233', email: 'ana@vet.co', especialidad: 'Medicina general',
       disponibilidad: 'Lunes a viernes', refugio: { id: 7 },
     })
   })
@@ -57,6 +57,11 @@ describe('normalizeVet', () => {
       id: 4, nombre: 'Dra. Ana Ruiz', telefono: '3001112233', correo: 'ana@vet.co',
       especialidad: 'Medicina general', disponibilidad: 'Lunes a viernes', refugio: 'Huellitas',
     })
+  })
+
+  it('reads the email sent by the API as `email`', () => {
+    const { correo, ...withoutCorreo } = raw
+    expect(normalizeVet({ ...withoutCorreo, email: correo }).correo).toBe('ana@vet.co')
   })
 
   it('uses safe defaults for missing data', () => {

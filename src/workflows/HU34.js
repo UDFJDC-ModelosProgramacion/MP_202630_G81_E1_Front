@@ -35,7 +35,7 @@ export function buildVetPayload(values) {
   return {
     nombre: clean.nombre,
     telefono: clean.telefono,
-    correo: clean.correo,
+    email: clean.correo,
     especialidad: clean.especialidad,
     disponibilidad: clean.disponibilidad,
     refugio: { id: Number(clean.refugioId) },
@@ -47,7 +47,7 @@ export function normalizeVet(raw) {
     id: raw.id ?? null,
     nombre: text(raw.nombre, 'Sin nombre'),
     telefono: text(raw.telefono),
-    correo: text(raw.correo),
+    correo: text(raw.email ?? raw.correo),
     especialidad: text(raw.especialidad, 'Sin especialidad'),
     disponibilidad: text(raw.disponibilidad, 'No registrada'),
     refugio: text(raw.refugio?.nombre, 'Refugio no registrado'),
