@@ -36,8 +36,8 @@ describe('getApiUrl', () => {
   })
 
   it('uses VITE_API_URL and removes trailing slashes', () => {
-    expect(getApiUrl({ VITE_API_URL: 'http://localhost:8999/api///' }))
-      .toBe('http://localhost:8999/api')
+    expect(getApiUrl({ VITE_API_URL: 'http://localhost:8080/api///' }))
+      .toBe('http://localhost:8080/api')
   })
 })
 

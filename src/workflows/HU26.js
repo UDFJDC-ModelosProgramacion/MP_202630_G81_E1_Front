@@ -1,4 +1,4 @@
-export const DEFAULT_API_URL = 'http://localhost:8999/api'
+export const DEFAULT_API_URL = 'http://localhost:8080/api'
 
 export class NotificationError extends Error {
   constructor(message, options = {}) {

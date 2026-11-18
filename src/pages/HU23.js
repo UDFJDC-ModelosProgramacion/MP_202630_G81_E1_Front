@@ -1,5 +1,8 @@
+
 import '../style.css'
 import '../HU23.css'
+import { renderStoryLinks } from '../story-navigation.js'
+import { renderStorySidebar } from '../story-sidebar.js'
 import {
   filterUpdates,
   findUpdateById,
@@ -9,21 +12,31 @@ import {
 const app = document.querySelector('#app')
 
 app.innerHTML = `
-  <header class="site-header mx-auto flex items-center justify-between">
-    <a class="brand" href="./index.html" aria-label="Huellitas, inicio">
-      <span class="brand-mark" aria-hidden="true">🐾</span>
-      <span>huellitas<span class="brand-dot">.</span></span>
-    </a>
-    <nav class="header-nav" id="primary-navigation" aria-label="Navegación principal">
-      <a href="./index.html">Inicio</a>
-      <a href="./actualizaciones.html">Registrar actualizaciones</a>
-    </nav>
-    <button class="menu-toggle" type="button" aria-label="Abrir navegación" aria-controls="primary-navigation" aria-expanded="false">
-      <span></span><span></span>
-    </button>
-  </header>
+  
+<header class="site-header mx-auto flex items-center justify-between">
+  <a class="brand" href="./HU01.html" aria-label="Huellitas, inicio">
+    <span class="brand-mark" aria-hidden="true">🐾</span>
+    <span>huellitas<span class="brand-dot">.</span></span>
+  </a>
 
-  <main class="mx-auto w-full hu23-main">
+  <nav class="header-nav" id="primary-navigation" aria-label="Navegación principal">
+    ${renderStoryLinks('HU23')}
+  </nav>
+
+  <button class="menu-toggle" type="button"
+    aria-label="Abrir navegación"
+    aria-controls="primary-navigation"
+    aria-expanded="false">
+    <span></span><span></span>
+  </button>
+</header>
+
+
+  
+<main class="mx-auto w-full hu23-main">
+  <div class="story-layout">
+    <div class="story-primary">
+
     <section class="page-intro">
       <div class="intro-copy">
         <p class="eyebrow"><span class="eyebrow-dot"></span> HISTORIAL Y SEGUIMIENTO</p>
@@ -107,10 +120,37 @@ app.innerHTML = `
       <p id="empty-state" class="hu23-empty" hidden>No se encontraron actualizaciones para esta consulta.</p>
       <ul id="updates-list" class="hu23-list"></ul>
     </section>
+
+    </div>
+
+    ${renderStorySidebar({
+      sidebarLabel: 'Información del historial',
+      petStatus: 'Seguimiento activo',
+      petEmoji: '🐾',
+      petTitle: 'Historias que continúan',
+      petTag: 'HU23',
+      petSubtitle: 'Historial de actualizaciones',
+      asideDescription: 'Cada actualización permite conocer mejor el seguimiento de nuestras mascotas y adoptantes.',
+      helpTitle: 'Consulta el historial',
+      helpDescription: 'Encuentra las actualizaciones registradas y consulta los detalles de cada seguimiento.',
+      helpSteps: [
+        ['Filtra los registros', 'Selecciona el tipo de actualización o escribe un identificador.'],
+        ['Consulta una actualización', 'Utiliza el ID para buscar un registro específico.'],
+        ['Revisa los resultados', 'Consulta la información y fecha de cada actualización.'],
+      ],
+      helpLink: {
+        href: './HU22.html',
+        label: 'Registrar una actualización',
+      },
+      asideNote: 'Cada actualización cuenta una parte de su historia.',
+    })}
+  </div>
+</main>
+
   </main>
 
   <footer class="site-footer mx-auto flex items-center justify-between">
-    <a class="brand footer-brand" href="./index.html">
+    <a class="brand footer-brand" href="./HU01.html">
       <span class="brand-mark" aria-hidden="true">🐾</span>
       <span>huellitas<span class="brand-dot">.</span></span>
     </a>

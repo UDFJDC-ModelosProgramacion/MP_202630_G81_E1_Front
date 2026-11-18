@@ -1,3 +1,9 @@
+
+import '../style.css'
+import '../HU28.css'
+import { renderStoryLinks } from '../story-navigation.js'
+import { renderStorySidebar } from '../story-sidebar.js'
+
 import {
   getMedicalEvents,
   getPets,
@@ -6,6 +12,45 @@ import {
 } from '../workflows/HU28.js';
 
 const $ = (selector) => document.querySelector(selector);
+
+$('#primary-navigation').innerHTML = renderStoryLinks('HU28');
+
+$('#hu28-sidebar').innerHTML = renderStorySidebar({
+  sidebarLabel: 'Información médica de mascotas',
+  petStatus: 'En adopción',
+  petEmoji: '🐶',
+  petTitle: 'Cuidamos su salud',
+  petTag: 'HU28',
+  petSubtitle: 'Bienestar animal',
+  asideDescription: 'El seguimiento médico permite mantener organizada la información sobre la salud de cada mascota.',
+  helpTitle: 'Registra un evento médico',
+  helpDescription: 'Guarda diagnósticos y tratamientos para consultar posteriormente su historial.',
+  helpSteps: [
+    ['Selecciona la mascota', 'Escoge la mascota que recibió la atención médica.'],
+    ['Registra la información', 'Completa la fecha, descripción, diagnóstico y tratamiento.'],
+    ['Guarda el evento', 'Registra los datos y consulta el historial cuando lo necesites.'],
+  ],
+  helpLink: {
+    href: './HU29.html',
+    label: 'Consultar historial médico',
+  },
+  asideNote: 'Cada registro médico ayuda a mantener un mejor seguimiento del bienestar de las mascotas.',
+});
+
+const menuToggle = $('.menu-toggle');
+
+menuToggle.addEventListener('click', () => {
+  const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+
+  menuToggle.setAttribute('aria-expanded', String(!expanded));
+  menuToggle.setAttribute(
+    'aria-label',
+    expanded ? 'Abrir navegación' : 'Cerrar navegación',
+  );
+
+  $('#primary-navigation').classList.toggle('nav-open', !expanded);
+});
+
 
 const listElement = $('#events-list');
 const feedbackElement = $('#feedback');
