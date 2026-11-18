@@ -11,6 +11,7 @@ export default defineConfig({
         'src/workflows/storage.js',
         'src/catalog/catalog.js',
         'src/api/client.js',
+        'src/api-client.js',
       ],
       reporter: ['text', 'html', 'lcov'],
       thresholds: {

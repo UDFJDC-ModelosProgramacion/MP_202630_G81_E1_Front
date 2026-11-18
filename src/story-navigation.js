@@ -21,7 +21,11 @@ const stories = [
   ['HU20', 'Prueba de convivencia'],
   ['HU21', 'Devolución'],
   ['HU30', 'Gestionar refugios'],
+  ['HU31', 'Detalle de un refugio'],
+  ['HU32', 'Registrar una mascota'],
   ['HU33', 'Catálogo de mascotas'],
+  ['HU34', 'Registrar veterinarios'],
+  ['HU35', 'Seguimientos veterinarios'],
 ]
 
 export function renderStoryLinks(activeStory) {

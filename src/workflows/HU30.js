@@ -52,11 +52,18 @@ export function parseShelterRoute(search = '') {
   }
 }
 
+// El back (RefugioDTO) llama `email` al correo; en el formulario y la interfaz se llama `correo`.
+export function toShelterPayload(values) {
+  const { correo, ...rest } = trimValues(values)
+  return { ...rest, email: correo }
+}
+
 export function normalizeShelter(raw) {
   const source = raw ?? {}
   return {
     id: source.id ?? null,
     ...Object.fromEntries(SHELTER_FIELDS.map(({ name }) => [name, String(source[name] ?? '')])),
+    correo: String(source.email ?? source.correo ?? ''),
   }
 }
 
@@ -119,7 +126,7 @@ export async function createShelter(fetchFn, values, apiUrl = DEFAULT_API_URL) {
   const body = await send(fetchFn, `${apiUrl}/refugios`, {
     method: 'POST',
     headers: WRITE_HEADERS,
-    body: JSON.stringify(trimValues(values)),
+    body: JSON.stringify(toShelterPayload(values)),
   })
   return normalizeShelter(body)
 }
@@ -128,7 +135,7 @@ export async function updateShelter(fetchFn, id, values, apiUrl = DEFAULT_API_UR
   const body = await send(
     fetchFn,
     `${apiUrl}/refugios/${encodeURIComponent(id)}`,
-    { method: 'PUT', headers: WRITE_HEADERS, body: JSON.stringify(trimValues(values)) },
+    { method: 'PUT', headers: WRITE_HEADERS, body: JSON.stringify(toShelterPayload(values)) },
     SHELTER_NOT_FOUND,
   )
   return normalizeShelter(body)
