@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   ALL_FILTER,
-  CatalogError,
   DEFAULT_API_URL,
   PET_NOT_FOUND,
   describeResults,
@@ -19,6 +18,7 @@ import {
   renderPetList,
   statusLabel,
 } from '../src/catalog/catalog.js'
+import { ApiError } from '../src/api-client.js'
 
 const rawMora = {
   id: 1,
@@ -42,6 +42,8 @@ const pets = [
 function jsonResponse(body, { ok = true, status = 200 } = {}) {
   return { ok, status, json: async () => body }
 }
+
+const GET_OPTIONS = { method: 'GET', headers: { Accept: 'application/json' } }
 
 describe('getApiUrl', () => {
   it('uses the default URL when nothing is configured', () => {
@@ -67,6 +69,7 @@ describe('normalizePet', () => {
       size: 'Mediano',
       temperament: 'Juguetona',
       status: 'Disponible',
+      shelterId: 7,
       shelterName: 'Huellitas',
       shelterCity: 'Bogotá',
     })
@@ -82,10 +85,15 @@ describe('normalizePet', () => {
       sex: '',
       size: '',
       temperament: '',
-      status: 'Disponible',
+      status: 'Estado no registrado',
+      shelterId: null,
       shelterName: 'Refugio no registrado',
       shelterCity: '',
     })
+  })
+
+  it('does not present a pet without a status as available', () => {
+    expect(normalizePet({ nombre: 'Luna' }).status).not.toBe('Disponible')
   })
 
   it('keeps an age of zero', () => {
@@ -99,9 +107,7 @@ describe('fetchPets', () => {
 
     const result = await fetchPets(fetchFn, 'http://api.test/api')
 
-    expect(fetchFn).toHaveBeenCalledWith('http://api.test/api/mascotas', {
-      headers: { Accept: 'application/json' },
-    })
+    expect(fetchFn).toHaveBeenCalledWith('http://api.test/api/mascotas', GET_OPTIONS)
     expect(result).toEqual([pets[0]])
   })
 
@@ -119,23 +125,35 @@ describe('fetchPets', () => {
   it('reports HTTP errors with their status', async () => {
     const fetchFn = vi.fn().mockResolvedValue(jsonResponse(null, { ok: false, status: 500 }))
     const error = await fetchPets(fetchFn).catch((e) => e)
-    expect(error).toBeInstanceOf(CatalogError)
+    expect(error).toBeInstanceOf(ApiError)
     expect(error.status).toBe(500)
     expect(error.message).toContain('no pudo entregar el catálogo')
   })
 
-  it('reports unreadable JSON', async () => {
+  it('shows the message the back-end sends when it rejects the request', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(jsonResponse({ apierror: { message: 'Base de datos fuera de servicio' } }, { ok: false, status: 503 }))
+    await expect(fetchPets(fetchFn)).rejects.toThrow('Base de datos fuera de servicio')
+  })
+
+  it('reports unreadable JSON as an unexpected format', async () => {
     const fetchFn = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => { throw new SyntaxError('bad json') },
     })
-    await expect(fetchPets(fetchFn)).rejects.toThrow('no se pueden leer')
+    await expect(fetchPets(fetchFn)).rejects.toThrow('formato inesperado')
   })
 
   it('reports responses that are not a list', async () => {
     const fetchFn = vi.fn().mockResolvedValue(jsonResponse({ message: 'nope' }))
     await expect(fetchPets(fetchFn)).rejects.toThrow('formato inesperado')
+  })
+
+  it('treats a 404 on the list as a generic server error', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(jsonResponse({}, { ok: false, status: 404 }))
+    const error = await fetchPets(fetchFn).catch((e) => e)
+    expect(error.status).toBe(404)
+    expect(error.message).toContain('no pudo entregar el catálogo')
   })
 })
 
@@ -160,6 +178,15 @@ describe('filterPets', () => {
     expect(filterPets(pets, { species: 'Perro', status: 'Adoptado' })).toEqual([])
   })
 
+  it('filters by species ignoring case, spaces and accents', () => {
+    const mixed = [
+      normalizePet({ id: 1, nombre: 'A', especie: 'perro' }),
+      normalizePet({ id: 2, nombre: 'B', especie: ' PERRO ' }),
+      normalizePet({ id: 3, nombre: 'C', especie: 'Gato' }),
+    ]
+    expect(filterPets(mixed, { species: 'Perro' }).map((p) => p.name)).toEqual(['A', 'B'])
+  })
+
   it('searches by name, breed or species ignoring case and accents', () => {
     expect(filterPets(pets, { search: 'felix' }).map((p) => p.name)).toEqual(['Félix'])
     expect(filterPets(pets, { search: '  LABRADOR ' }).map((p) => p.name)).toEqual(['Rocky'])
@@ -172,6 +199,11 @@ describe('getSpeciesOptions', () => {
   it('returns unique species sorted alphabetically', () => {
     expect(getSpeciesOptions(pets)).toEqual(['Gato', 'Perro'])
     expect(getSpeciesOptions([])).toEqual([])
+  })
+
+  it('lists species written with different case or accents only once', () => {
+    const mixed = ['Perro', 'perro', 'PERRO', 'Gato', 'gato'].map((especie) => normalizePet({ especie }))
+    expect(getSpeciesOptions(mixed)).toEqual(['Gato', 'Perro'])
   })
 })
 
@@ -198,7 +230,8 @@ describe('rendering', () => {
     expect(html).not.toContain('<script>')
     expect(html).toContain('&lt;script&gt;')
     expect(html).toContain('Edad no registrada')
-    expect(html).not.toContain('text-stone-600')
+    expect(html).not.toContain('pet-note')
+    expect(html).not.toContain('Ver detalle')
     expect(html).toContain('Refugio no registrado')
   })
 
@@ -219,9 +252,7 @@ describe('fetchPet', () => {
   it('requests one pet by id and returns it normalized', async () => {
     const fetchFn = vi.fn().mockResolvedValue(jsonResponse(rawMora))
     const pet = await fetchPet(fetchFn, '1', 'http://api.test/api')
-    expect(fetchFn).toHaveBeenCalledWith('http://api.test/api/mascotas/1', {
-      headers: { Accept: 'application/json' },
-    })
+    expect(fetchFn).toHaveBeenCalledWith('http://api.test/api/mascotas/1', GET_OPTIONS)
     expect(pet).toEqual(pets[0])
   })
 
@@ -234,7 +265,7 @@ describe('fetchPet', () => {
   it('reports that the pet was not found when the id does not exist', async () => {
     const fetchFn = vi.fn().mockResolvedValue(jsonResponse({}, { ok: false, status: 404 }))
     const error = await fetchPet(fetchFn, '999').catch((e) => e)
-    expect(error).toBeInstanceOf(CatalogError)
+    expect(error).toBeInstanceOf(ApiError)
     expect(error.message).toBe(PET_NOT_FOUND)
     expect(error.status).toBe(404)
   })
@@ -256,13 +287,6 @@ describe('fetchPet', () => {
       const fetchFn = vi.fn().mockResolvedValue(jsonResponse(body))
       await expect(fetchPet(fetchFn, '1')).rejects.toThrow('formato inesperado')
     }
-  })
-
-  it('treats a 404 on the list as a generic server error', async () => {
-    const fetchFn = vi.fn().mockResolvedValue(jsonResponse({}, { ok: false, status: 404 }))
-    const error = await fetchPets(fetchFn).catch((e) => e)
-    expect(error.status).toBe(404)
-    expect(error.message).toContain('no pudo entregar el catálogo')
   })
 })
 
@@ -297,12 +321,17 @@ describe('pet detail rendering', () => {
     expect(html).toContain('data-testid="pet-detail"')
   })
 
-  it('shows placeholders for missing data and escapes user text', () => {
+  it('links the detail to the shelter page (HU31) when the shelter is known', () => {
+    expect(renderPetDetail(pets[0])).toContain('href="./HU31.html?id=7"')
+  })
+
+  it('shows placeholders for missing data, escapes user text and has no shelter link', () => {
     const html = renderPetDetail(normalizePet({ nombre: '<b>x</b>' }))
     expect(html).not.toContain('<b>x</b>')
     expect(html).toContain('&lt;b&gt;x&lt;/b&gt;')
     expect(html).toContain('No registrado')
     expect(html).toContain('Edad no registrada')
     expect(html).toContain('Refugio no registrado')
+    expect(html).not.toContain('HU31.html')
   })
 })

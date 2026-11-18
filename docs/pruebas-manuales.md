@@ -1,4 +1,4 @@
-# Pruebas manuales (HU30 y HU33)
+# Pruebas manuales (HU30–HU35)
 
 Requisitos: back-end levantado, `npm run dev` y el navegador en `http://localhost:5173`.
 Anotar fecha, resultado (OK / Falla) y observaciones al ejecutarlas.
@@ -15,6 +15,10 @@ Anotar fecha, resultado (OK / Falla) y observaciones al ejecutarlas.
 | 6 | Id inexistente | Abrir `/HU33.html?id=99999` | «La mascota no fue encontrada.» sin botón «Reintentar» | |
 | 7 | Back apagado | Detener el back y recargar | Mensaje de error y botón «Reintentar»; al levantarlo y reintentar, carga | |
 | 8 | Teclado | Recorrer la página con Tab | Todos los controles se alcanzan y se ven con foco | |
+| 9 | Filtros durante la carga | Con el back lento o apagado, escribir en el buscador o cambiar un filtro | El mensaje de carga o de error sigue visible (no aparece «No hay mascotas disponibles») | |
+| 10 | Especies repetidas | Registrar en HU32 una mascota de especie «Perro» y otra «perro» | El filtro de especie muestra «Perro» una sola vez y lista ambas mascotas | |
+| 11 | Enlace al refugio | Abrir el detalle de una mascota con refugio y pulsar «Ver datos de contacto del refugio» | Se abre `HU31.html?id=` con los datos de ese refugio | |
+| 12 | Estilo común | Comparar `/HU33.html` con `/HU30.html` y `/HU31.html` | Misma cabecera, navegación y panel lateral; las tarjetas de HU31 y HU34 se ven con el mismo estilo | |
 
 ## HU30 — Gestionar refugios (`/HU30.html`)
 
@@ -28,3 +32,49 @@ Anotar fecha, resultado (OK / Falla) y observaciones al ejecutarlas.
 | 6 | Rechazo del API | Registrar un refugio que el back rechace | Se muestra el mensaje del back y se conservan los datos | |
 | 7 | Back apagado | Detener el back y guardar | Mensaje de error; los datos escritos se conservan | |
 | 8 | Teclado | Llenar el formulario solo con Tab y Enter | Se registra el refugio | |
+
+## HU31 — Detalle de un refugio (`/HU31.html`)
+
+| # | Caso | Pasos | Resultado esperado | Resultado |
+|---|---|---|---|---|
+| 1 | Consultar | Escribir el número de un refugio y consultar | Nombre, ciudad, dirección, teléfono y correo del refugio | |
+| 2 | Mascotas del refugio | Revisar la sección «Mascotas del refugio» | Listado de las mascotas de ese refugio, con enlace a su detalle | |
+| 3 | Sin mascotas | Consultar un refugio sin mascotas | «Este refugio no tiene mascotas registradas.» | |
+| 4 | Id inexistente | Abrir `/HU31.html?id=99999` | «El refugio no fue encontrado.» sin botón «Reintentar» | |
+| 5 | Número inválido | Escribir `abc` y consultar | «Ingresa el número del refugio.» | |
+| 6 | Back apagado | Detener el back y consultar | Mensaje de error y botón «Reintentar» | |
+
+## HU32 — Registrar una mascota (`/HU32.html`)
+
+| # | Caso | Pasos | Resultado esperado | Resultado |
+|---|---|---|---|---|
+| 1 | Registrar | Llenar nombre, especie y estado y registrar | «Mascota … registrada correctamente.» y aparece en el catálogo | |
+| 2 | Obligatorios | Registrar sin nombre, especie ni estado | Un error bajo cada campo y no se llama al API | |
+| 3 | Edad negativa | Escribir `-2` en la edad | «La edad no puede ser negativa.» | |
+| 4 | Refugio inexistente | Indicar un número de refugio que no existe | «El refugio indicado no existe.» | |
+| 5 | Eliminar | Escribir el número de una mascota sin seguimientos y confirmar | «Mascota eliminada correctamente.» | |
+| 6 | Eliminar con seguimientos | Eliminar una mascota con seguimientos veterinarios | Mensaje de error del API; la mascota no se elimina | |
+
+## HU34 — Registrar veterinarios (`/HU34.html`)
+
+| # | Caso | Pasos | Resultado esperado | Resultado |
+|---|---|---|---|---|
+| 1 | Registrar | Llenar todos los campos con un refugio existente | «Veterinario … registrado correctamente.» y aparece en el listado | |
+| 2 | Campos vacíos | Registrar sin llenar | Un error bajo cada campo y no se llama al API | |
+| 3 | Refugio inexistente | Indicar un refugio que no existe | «El refugio indicado no existe.» | |
+| 4 | Listado | Abrir la página | Lista de veterinarios registrados (o «Aún no hay veterinarios registrados.») | |
+| 5 | Consultar | Escribir el número de un veterinario | Sus datos completos | |
+| 6 | Id inexistente | Consultar el número 99999 | «El veterinario no fue encontrado.» | |
+
+## HU35 — Seguimientos veterinarios (`/HU35.html`)
+
+| # | Caso | Pasos | Resultado esperado | Resultado |
+|---|---|---|---|---|
+| 1 | Programar | Llenar fecha, estado, mascota y veterinario existentes | «Seguimiento programado correctamente.» | |
+| 2 | Fecha obligatoria | Programar sin fecha de asignación | «La fecha de asignación es obligatoria.» | |
+| 3 | Próxima cita anterior | Poner la próxima cita antes de la asignación | «La próxima cita no puede ser anterior a la fecha de asignación.» | |
+| 4 | Referencias inexistentes | Usar una mascota o veterinario que no existe | «La mascota o el veterinario indicado no existe.» | |
+| 5 | Consultar | Escribir el número de una mascota y consultar | Lista de sus seguimientos (o «Esta mascota no tiene seguimientos registrados.») | |
+| 6 | Editar | Pulsar «Editar» en un seguimiento programado y guardar | «Seguimiento actualizado correctamente.» | |
+| 7 | Completado | Pulsar «Editar» o «Eliminar» en un seguimiento «Completado» | «No se puede modificar ni eliminar un seguimiento en estado "Completado".» | |
+| 8 | Eliminar | Eliminar un seguimiento programado y confirmar | «Seguimiento eliminado correctamente.» | |
