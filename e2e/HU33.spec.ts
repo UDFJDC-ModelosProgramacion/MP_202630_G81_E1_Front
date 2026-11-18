@@ -142,6 +142,7 @@ test('opens the detail of a pet from the catalog', async ({ page }) => {
   await expect(page.getByTestId('pet-detail')).toContainText('Huellitas · Bogotá')
   await expect(page.getByRole('link', { name: '← Volver al catálogo' })).toBeVisible()
   await expect(page.getByTestId('pet-card')).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'Ver datos de contacto del refugio' })).toHaveAttribute('href', './HU31.html?id=7')
 })
 
 test('shows an error when the pet does not exist', async ({ page }) => {
@@ -173,4 +174,49 @@ test('lets the user retry the detail when the server fails', async ({ page }) =>
   await expect(page.getByRole('alert')).toContainText('no pudo entregar')
   await page.getByRole('button', { name: 'Reintentar' }).click()
   await expect(page.getByTestId('pet-detail')).toContainText('Mora')
+})
+
+test('does not replace the loading message with the empty state when typing during the load', async ({ page }) => {
+  let release: () => void = () => {}
+  const gate = new Promise<void>((resolve) => { release = resolve })
+  await page.route(API, async (route) => {
+    await gate
+    await route.fulfill({ status: 200, contentType: 'application/json', headers: cors, body: JSON.stringify(mascotas) })
+  })
+  await page.goto('/HU33.html')
+
+  await page.getByLabel('Buscar por nombre o raza').fill('mora')
+  await expect(page.getByText('Cargando mascotas')).toBeVisible()
+  await expect(page.getByText('No hay mascotas disponibles por el momento')).toBeHidden()
+
+  release()
+  await expect(page.getByTestId('pet-card')).toHaveCount(1)
+  await expect(page.getByRole('heading', { name: 'Mora' })).toBeVisible()
+})
+
+test('keeps the error visible when the filters are used after a failed load', async ({ page }) => {
+  await mockPets(page, {}, 500)
+  await page.goto('/HU33.html')
+  await expect(page.getByRole('alert')).toContainText('no pudo entregar el catálogo')
+
+  await page.getByLabel('Buscar por nombre o raza').fill('mora')
+  await page.getByLabel('Estado').selectOption('Adoptado')
+
+  await expect(page.getByRole('alert')).toContainText('no pudo entregar el catálogo')
+  await expect(page.getByText('No hay mascotas disponibles por el momento')).toBeHidden()
+  await expect(page.getByRole('button', { name: 'Reintentar' })).toBeVisible()
+})
+
+test('lists a species written with different capitalization only once and filters all of them', async ({ page }) => {
+  await mockPets(page, [
+    { ...mascotas[0], id: 1, nombre: 'Mora', especie: 'Perro' },
+    { ...mascotas[2], id: 3, nombre: 'Rocky', especie: 'perro' },
+    { ...mascotas[1], id: 2, nombre: 'Félix', especie: 'Gato' },
+  ])
+  await page.goto('/HU33.html')
+  await expect(page.getByTestId('pet-card')).toHaveCount(3)
+
+  await expect(page.getByLabel('Especie').locator('option')).toHaveText(['Todas', 'Gato', 'Perro'])
+  await page.getByLabel('Especie').selectOption('Perro')
+  await expect(page.getByTestId('pet-card')).toHaveCount(2)
 })

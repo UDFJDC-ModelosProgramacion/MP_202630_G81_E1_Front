@@ -1,8 +1,8 @@
 # Huellitas — solicitudes de adopción
 
-Interfaz frontend para las historias HU01–HU17, HU18–HU21, HU30 y HU33. Cada historia tiene una página separada y comparte el estilo visual de Huellitas.
+Interfaz frontend para las historias HU01–HU17, HU18–HU21, HU30–HU35. Cada historia tiene una página separada y comparte el estilo visual de Huellitas.
 
-Los datos de HU01–HU08 y HU18–HU21 se guardan en `localStorage` como demostración; no se conectan a un backend. HU01 presenta la galería fotográfica y HU33 conserva la integración del catálogo con el API.
+Los datos de HU01–HU08 y HU18–HU21 se guardan en `localStorage` como demostración; no se conectan a un backend. HU01 presenta la galería fotográfica y HU30–HU35 (refugios, mascotas, veterinarios y seguimientos) consumen el API del back-end, que se espera en `http://localhost:8080/api`; si corre en otra dirección, crear un archivo `.env.local` con `VITE_API_URL=http://servidor:puerto/api`.
 
 ## Tecnologías
 
@@ -66,9 +66,15 @@ Página `HU08.html` para marcar mensajes propios como leídos o no leídos, indi
 
 ## HU33 — Catálogo de mascotas
 
-Página `HU33.html` que consulta `GET {API}/mascotas` del back-end y muestra las mascotas en tarjetas (nombre, especie, raza, edad, sexo, tamaño, estado y refugio). Incluye búsqueda por nombre o raza, filtros por especie y estado, mensajes de carga, error (con botón **Reintentar**) y un mensaje cuando no hay mascotas disponibles.
+Página `HU33.html` (código en `src/pages/HU33.js`, con la misma cabecera, navegación y panel lateral que las demás historias) que consulta `GET {API}/mascotas` del back-end y muestra las mascotas en tarjetas (nombre, especie, raza, edad, sexo, tamaño, estado y refugio). Incluye búsqueda por nombre o raza, filtros por especie y estado, mensajes de carga, error (con botón **Reintentar**) y un mensaje cuando no hay mascotas disponibles.
 
-Cada tarjeta tiene un botón **Ver detalle** que abre `HU33.html?id={id}`, donde se consulta `GET {API}/mascotas/{id}` y se muestran todos los datos de la mascota. Si el id no existe se muestra «La mascota no fue encontrada.».
+- La lista de especies no repite valores escritos con distinta mayúscula o tilde («Perro» y «perro» salen una sola vez y el filtro agrupa ambos), porque HU32 recibe la especie como texto libre.
+- Mientras el catálogo carga, o si la carga falló, usar los filtros no reemplaza el mensaje de carga o de error.
+- Una mascota sin estado ya no se muestra como «Disponible»; aparece como «Estado no registrado».
+
+Cada tarjeta tiene un botón **Ver detalle** que abre `HU33.html?id={id}`, donde se consulta `GET {API}/mascotas/{id}` y se muestran todos los datos de la mascota, con un enlace al refugio (`HU31.html?id={refugio}`). Si el id no existe se muestra «La mascota no fue encontrada.».
+
+La lógica está en `src/catalog/catalog.js`, que usa el cliente compartido `src/api-client.js` (por eso también muestra el mensaje que devuelve el API cuando rechaza una petición). Los estilos de tarjetas, estados y mensajes están en `src/catalog/catalog.css`, que también cargan HU31 y HU34 porque reutilizan esas clases.
 
 ### Cómo ejecutar HU33
 
@@ -100,3 +106,22 @@ Página `HU30.html` para registrar y editar los datos de contacto de un refugio 
 - Mensajes de carga, éxito y error (incluidos los que devuelve el API), errores accesibles y uso completo con teclado.
 
 La lógica está en `src/workflows/HU30.js` (cobertura del 100 %), la interfaz en `src/pages/HU30.js` y las pruebas en `tests/HU30.test.js` y `e2e/HU30.spec.ts`. Las pruebas manuales de HU30 y HU33 están en [`docs/pruebas-manuales.md`](docs/pruebas-manuales.md).
+
+## HU31 — Detalle de un refugio
+
+Página `HU31.html`: escribir el número de un refugio (o abrir `http://localhost:5173/HU31.html?id=1`) para consultar `GET {API}/refugios/{id}`. Muestra nombre, ciudad, dirección, teléfono y correo, y la lista de mascotas registradas en ese refugio, cada una con un enlace a su detalle (`HU33.html?id=`). Si el refugio no tiene mascotas muestra «Este refugio no tiene mascotas registradas.»; si no existe muestra «El refugio no fue encontrado.».
+
+## HU32 — Registrar una mascota
+
+Página `HU32.html` con el formulario de registro (`POST {API}/mascotas`): nombre y especie obligatorios, edad no negativa, estado entre «Disponible», «En proceso de adopcion» y «Adoptado», y refugio opcional (si se indica, debe existir). También permite eliminar una mascota por su número (`DELETE {API}/mascotas/{id}`); si la mascota tiene seguimientos veterinarios se muestra el error que devuelve el API.
+
+## HU34 — Registrar veterinarios de un refugio
+
+Página `HU34.html`: formulario de registro (`POST {API}/veterinarios`) con nombre, teléfono, correo, especialidad, disponibilidad y el número del refugio al que queda asociado (si no existe se muestra un error). Muestra el listado de veterinarios registrados (`GET {API}/veterinarios`) y permite consultar uno por su número (`GET {API}/veterinarios/{id}`), con el mensaje «El veterinario no fue encontrado.» si no existe.
+
+## HU35 — Programar y consultar seguimientos veterinarios
+
+Página `HU35.html`: formulario para programar un seguimiento (`POST {API}/seguimientos`) con fecha de asignación obligatoria, próxima cita (no puede ser anterior a la asignación), observación, estado y los números de la mascota y del veterinario, que deben existir. Permite consultar los seguimientos de una mascota por su número, editarlos (`PUT`) y eliminarlos (`DELETE`); un seguimiento «Completado» no se puede modificar ni eliminar.
+
+La lógica compartida del API está en `src/api-client.js` (cobertura del 100 %) y las utilidades de formularios en `src/admin-ui.js`. Cada historia tiene su lógica en `src/workflows/HUxx.js`, su página en `src/pages/HUxx.js`, y sus pruebas en `tests/HUxx.test.js` y `e2e/HUxx.spec.ts`.
+

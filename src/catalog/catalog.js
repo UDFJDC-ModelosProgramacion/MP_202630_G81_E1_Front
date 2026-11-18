@@ -1,4 +1,6 @@
-// HU33 - Pet catalog: pure logic (no DOM access) so it can be unit tested.
+// HU33 - Catálogo de mascotas: lógica pura (sin DOM) para poder probarla con pruebas unitarias.
+// También la usan HU30, HU31, HU32, HU34 y HU35 (URL del API, normalización de mascotas y escapeHtml).
+import { expectList, expectObject, parseIdParam, requestJson, text } from '../api-client.js'
 
 export const DEFAULT_API_URL = 'http://localhost:8080/api'
 
@@ -8,79 +10,31 @@ export const ALL_FILTER = 'todos'
 
 export const EMPTY_CATALOG_MESSAGE = 'No hay mascotas disponibles.'
 
-export class CatalogError extends Error {
-  constructor(message, { status = null } = {}) {
-    super(message)
-    this.name = 'CatalogError'
-    this.status = status
-  }
-}
+export const PET_NOT_FOUND = 'La mascota no fue encontrada.'
+
+const CATALOG_FAILURE = 'El servidor no pudo entregar el catálogo en este momento.'
 
 export function getApiUrl(env = {}) {
   const configured = typeof env.VITE_API_URL === 'string' ? env.VITE_API_URL.trim() : ''
   return (configured || DEFAULT_API_URL).replace(/\/+$/, '')
 }
 
-async function requestJson(fetchFn, url, { notFound = '' } = {}) {
-  let response
-  try {
-    response = await fetchFn(url, { headers: { Accept: 'application/json' } })
-  } catch {
-    throw new CatalogError('No pudimos conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.')
-  }
-
-  if (response.status === 404 && notFound) {
-    throw new CatalogError(notFound, { status: 404 })
-  }
-
-  if (!response.ok) {
-    throw new CatalogError('El servidor no pudo entregar el catálogo en este momento.', {
-      status: response.status,
-    })
-  }
-
-  try {
-    return await response.json()
-  } catch {
-    throw new CatalogError('El servidor respondió con datos que no se pueden leer.')
-  }
-}
-
 export async function fetchPets(fetchFn, apiUrl = DEFAULT_API_URL) {
-  const data = await requestJson(fetchFn, `${apiUrl}/mascotas`)
-
-  if (!Array.isArray(data)) {
-    throw new CatalogError('El servidor respondió con un formato inesperado.')
-  }
-
-  return data.map(normalizePet)
+  const body = await requestJson(fetchFn, `${apiUrl}/mascotas`, { failure: CATALOG_FAILURE })
+  return expectList(body).map(normalizePet)
 }
-
-export const PET_NOT_FOUND = 'La mascota no fue encontrada.'
 
 export async function fetchPet(fetchFn, id, apiUrl = DEFAULT_API_URL) {
-  const data = await requestJson(fetchFn, `${apiUrl}/mascotas/${encodeURIComponent(id)}`, {
+  const body = await requestJson(fetchFn, `${apiUrl}/mascotas/${encodeURIComponent(id)}`, {
     notFound: PET_NOT_FOUND,
+    failure: CATALOG_FAILURE,
   })
-
-  if (data === null || typeof data !== 'object' || Array.isArray(data)) {
-    throw new CatalogError('El servidor respondió con un formato inesperado.')
-  }
-
-  return normalizePet(data)
+  return normalizePet(expectObject(body))
 }
 
 export function parsePetRoute(search = '') {
-  const params = new URLSearchParams(search)
-  const id = params.get('id')
-  return {
-    detail: params.has('id'),
-    id: id !== null && /^\d+$/.test(id) ? id : null,
-  }
-}
-
-function text(value, fallback = '') {
-  return typeof value === 'string' && value.trim() ? value.trim() : fallback
+  const { present, id } = parseIdParam(search)
+  return { detail: present, id }
 }
 
 export function normalizePet(raw) {
@@ -94,7 +48,8 @@ export function normalizePet(raw) {
     sex: text(raw.sexo),
     size: text(raw.tamano),
     temperament: text(raw.temperamento),
-    status: text(raw.estado, 'Disponible'),
+    status: text(raw.estado, 'Estado no registrado'),
+    shelterId: shelter.id ?? null,
     shelterName: text(shelter.nombre, 'Refugio no registrado'),
     shelterCity: text(shelter.ciudad),
   }
@@ -106,22 +61,30 @@ export function formatAge(age) {
   return age === 1 ? '1 año' : `${age} años`
 }
 
+// Compara sin tildes ni mayúsculas: "Félix" y "felix", o "Perro" y "perro", son lo mismo.
 function normalize(value) {
-  return value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 }
 
 export function filterPets(pets, { search = '', species = ALL_FILTER, status = ALL_FILTER } = {}) {
   const query = normalize(search.trim())
+  const wantedSpecies = normalize(species)
   return pets.filter((pet) => {
-    if (species !== ALL_FILTER && pet.species !== species) return false
+    if (species !== ALL_FILTER && normalize(pet.species) !== wantedSpecies) return false
     if (status !== ALL_FILTER && pet.status !== status) return false
     if (!query) return true
     return [pet.name, pet.breed, pet.species].some((field) => normalize(field).includes(query))
   })
 }
 
+// La especie se escribe libre en HU32, así que «perro» y «Perro» deben salir una sola vez.
 export function getSpeciesOptions(pets) {
-  return [...new Set(pets.map((pet) => pet.species))].sort((a, b) => a.localeCompare(b, 'es'))
+  const unique = new Map()
+  for (const pet of pets) {
+    const key = normalize(pet.species)
+    if (!unique.has(key)) unique.set(key, pet.species)
+  }
+  return [...unique.values()].sort((a, b) => a.localeCompare(b, 'es'))
 }
 
 export function escapeHtml(value) {
@@ -137,26 +100,29 @@ export function statusLabel(status) {
   return status === 'En proceso de adopcion' ? 'En proceso de adopción' : status
 }
 
+const place = (pet) => [pet.shelterName, pet.shelterCity].filter(Boolean).join(' · ')
+
+const statusBadge = (pet) => `<span class="status-badge" data-status="${escapeHtml(pet.status)}">${escapeHtml(statusLabel(pet.status))}</span>`
+
 export function renderPetCard(pet) {
   const details = [pet.breed, formatAge(pet.age), pet.sex, pet.size].filter(Boolean)
-  const place = [pet.shelterName, pet.shelterCity].filter(Boolean).join(' · ')
   const temperament = pet.temperament
-    ? `<p class="mt-2 text-sm text-stone-600">${escapeHtml(pet.temperament)}</p>`
+    ? `<p class="pet-note">${escapeHtml(pet.temperament)}</p>`
     : ''
   const detailLink = pet.id === null
     ? ''
-    : `<a class="btn btn-secondary mt-4 inline-block" href="./HU33.html?id=${encodeURIComponent(pet.id)}" aria-label="Ver detalle de ${escapeHtml(pet.name)}">Ver detalle</a>`
+    : `<a class="secondary-button card-link" href="./HU33.html?id=${encodeURIComponent(pet.id)}" aria-label="Ver detalle de ${escapeHtml(pet.name)}">Ver detalle</a>`
 
   return `
-    <li class="pet-card rounded-2xl border border-stone-200 bg-white p-5 shadow-sm" data-testid="pet-card">
-      <div class="flex items-start justify-between gap-3">
-        <h3 class="text-xl font-bold text-stone-900">${escapeHtml(pet.name)}</h3>
-        <span class="status-badge rounded-full px-3 py-1 text-xs font-semibold" data-status="${escapeHtml(pet.status)}">${escapeHtml(statusLabel(pet.status))}</span>
+    <li class="pet-card" data-testid="pet-card">
+      <div class="pet-card-head">
+        <h3>${escapeHtml(pet.name)}</h3>
+        ${statusBadge(pet)}
       </div>
-      <p class="mt-1 text-sm font-semibold text-orange-700">${escapeHtml(pet.species)}</p>
-      <p class="mt-2 text-sm text-stone-700">${details.map(escapeHtml).join(' · ')}</p>
+      <p class="pet-species">${escapeHtml(pet.species)}</p>
+      <p class="pet-meta">${details.map(escapeHtml).join(' · ')}</p>
       ${temperament}
-      <p class="mt-4 text-sm text-stone-500"><span aria-hidden="true">📍</span> ${escapeHtml(place)}</p>
+      <p class="pet-place"><span aria-hidden="true">📍</span> ${escapeHtml(place(pet))}</p>
       ${detailLink}
     </li>`
 }
@@ -179,18 +145,22 @@ export function renderPetDetail(pet) {
     ['Sexo', pet.sex || 'No registrado'],
     ['Tamaño', pet.size || 'No registrado'],
     ['Temperamento', pet.temperament || 'No registrado'],
-    ['Refugio', [pet.shelterName, pet.shelterCity].filter(Boolean).join(' · ')],
+    ['Refugio', place(pet)],
   ]
   const items = rows
     .map(([label, value]) => `<div class="detail-row"><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`)
     .join('')
+  const shelterLink = pet.shelterId === null
+    ? ''
+    : `<p class="pet-actions"><a href="./HU31.html?id=${encodeURIComponent(pet.shelterId)}">Ver datos de contacto del refugio</a></p>`
 
   return `
-    <article class="pet-card rounded-2xl border border-stone-200 bg-white p-6 shadow-sm" data-testid="pet-detail">
-      <div class="flex items-start justify-between gap-3">
-        <h2 class="text-2xl font-bold text-stone-900">${escapeHtml(pet.name)}</h2>
-        <span class="status-badge rounded-full px-3 py-1 text-xs font-semibold" data-status="${escapeHtml(pet.status)}">${escapeHtml(statusLabel(pet.status))}</span>
+    <article class="pet-card" data-testid="pet-detail">
+      <div class="pet-card-head">
+        <h2>${escapeHtml(pet.name)}</h2>
+        ${statusBadge(pet)}
       </div>
-      <dl class="mt-4 grid gap-3 sm:grid-cols-2">${items}</dl>
+      <dl class="detail-list">${items}</dl>
+      ${shelterLink}
     </article>`
 }
