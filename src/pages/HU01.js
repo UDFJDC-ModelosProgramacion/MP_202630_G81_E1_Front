@@ -1,9 +1,11 @@
 import '../style.css'
-import { getPetGallery, pets } from '../gallery.js'
 import { renderStoryLinks } from '../story-navigation.js'
 import { renderStorySidebar } from '../story-sidebar.js'
+import { escapeHtml, getApiUrl } from '../api/client.js'
+import { listPets, listPhotos } from '../workflows/story-api.js'
 
 const app = document.querySelector('#app')
+let pets = []
 
 app.innerHTML = `
   <header class="site-header mx-auto flex items-center justify-between">
@@ -26,9 +28,7 @@ app.innerHTML = `
           <h1>Una historia en cada mirada.</h1>
           <p>Conoce a las mascotas que esperan un hogar a través de sus fotografías.</p>
         </section>
-        <nav class="gallery-pet-nav" aria-label="Galerías de mascotas">
-          ${pets.map((pet) => `<a href="#galeria/${pet.id}">${pet.name}<span>${pet.photos.length} ${pet.photos.length === 1 ? 'foto' : 'fotos'}</span></a>`).join('')}
-        </nav>
+        <nav class="gallery-pet-nav" aria-label="Galerías de mascotas"></nav>
         <section class="gallery-view" id="gallery-view" aria-live="polite"></section>
       </div>
       ${renderStorySidebar({
@@ -54,42 +54,74 @@ app.innerHTML = `
 `
 
 const galleryView = document.querySelector('#gallery-view')
+const petNav = document.querySelector('.gallery-pet-nav')
+const API_OPTIONS = { apiUrl: getApiUrl(import.meta.env), fetchFn: window.fetch.bind(window) }
 
-function renderGallery(petId) {
-  const gallery = getPetGallery(petId, window.localStorage)
-  if (gallery.status === 'not-found') {
-    galleryView.innerHTML = `
-      <div class="gallery-message" role="alert"><span aria-hidden="true">?</span><p class="step-label">MASCOTA NO ENCONTRADA</p><h2>No encontramos a esta mascota</h2><p>Puede que el enlace haya cambiado o que ya no esté disponible.</p><a class="home-primary-action" href="./HU18.html">Explorar mascotas</a></div>
-    `
+function showGalleryMessage(message, type = 'status') {
+  galleryView.innerHTML = `<div class="gallery-message" role="${type}"><p>${escapeHtml(message)}</p></div>`
+}
+
+function activePetFromRoute() {
+  const fragment = window.location.hash.slice(1).split('/')[1]
+  if (!fragment) return pets[0]
+  return pets.find((pet) => String(pet.id) === fragment
+    || pet.name.toLocaleLowerCase('es').replace(/\s+/g, '-') === fragment.toLocaleLowerCase('es'))
+}
+
+async function renderGallery() {
+  const pet = activePetFromRoute()
+  if (!pet) {
+    showGalleryMessage(pets.length ? 'No encontramos a esta mascota en el catálogo.' : 'No hay mascotas registradas en el catálogo.', 'alert')
     return
   }
 
-  if (gallery.status === 'empty') {
+  showGalleryMessage('Cargando fotografías…')
+  const result = await listPhotos(pet.id, API_OPTIONS)
+  if (!result.ok) {
+    galleryView.innerHTML = `<div class="gallery-message" role="alert"><p>${escapeHtml(result.message)}</p><button class="secondary-button" type="button" id="gallery-retry">Reintentar</button></div>`
+    galleryView.querySelector('#gallery-retry').addEventListener('click', renderGallery)
+    return
+  }
+
+  const photos = result.photos.sort((first, second) => Number(second.principal) - Number(first.principal))
+  const petName = escapeHtml(pet.name)
+  const description = [pet.breed, pet.age === null ? '' : `${pet.age} años`, pet.location].filter(Boolean).map(escapeHtml).join(' · ')
+  if (photos.length === 0) {
     galleryView.innerHTML = `
-      <div class="gallery-heading"><p class="step-label">GALERÍA DE MASCOTA</p><h2>${gallery.pet.name}</h2><p>${gallery.pet.breed} · ${gallery.pet.age}</p></div>
-      <div class="gallery-message" role="status"><span aria-hidden="true">▧</span><h2>Aún no hay fotografías disponibles</h2><p>Estamos preparando las fotos de ${gallery.pet.name}. Vuelve pronto para conocerla mejor.</p></div>
+      <div class="gallery-heading"><p class="step-label">GALERÍA DE MASCOTA</p><h2>${petName}</h2><p>${description}</p></div>
+      <div class="gallery-message" role="status"><span aria-hidden="true">▧</span><h2>Aún no hay fotografías disponibles</h2><p>Estamos preparando las fotos de ${petName}. Vuelve pronto para conocerla mejor.</p></div>
     `
     return
   }
 
   galleryView.innerHTML = `
-    <div class="gallery-heading"><div><p class="step-label">GALERÍA DE MASCOTA</p><h2>${gallery.pet.name}<span class="gallery-count">${gallery.photos.length} fotografías</span></h2><p>${gallery.pet.breed} · ${gallery.pet.age} · ${gallery.pet.location}</p></div><a class="home-primary-action" href="./HU18.html#solicitud">Solicitar adopción <span aria-hidden="true">→</span></a></div>
-    <div class="photo-gallery">${gallery.photos.map((photo, index) => `
+    <div class="gallery-heading"><div><p class="step-label">GALERÍA DE MASCOTA</p><h2>${petName}<span class="gallery-count">${photos.length} fotografías</span></h2><p>${description}</p></div><a class="home-primary-action" href="./HU18.html#solicitud">Solicitar adopción <span aria-hidden="true">→</span></a></div>
+    <div class="photo-gallery">${photos.map((photo, index) => `
       <figure class="gallery-photo ${photo.principal ? 'gallery-photo-main' : ''}">
-        <img src="${photo.src}" alt="${photo.alt}" loading="${index === 0 ? 'eager' : 'lazy'}">
+        <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.description || `Fotografía de ${pet.name}`)}" loading="${index === 0 ? 'eager' : 'lazy'}">
         ${photo.principal ? '<figcaption>Fotografía principal</figcaption>' : ''}
       </figure>
     `).join('')}</div>
   `
 }
 
-function renderRoute() {
-  const [, petId = 'mora'] = window.location.hash.slice(1).split('/')
-  renderGallery(petId)
+async function loadGallery() {
+  showGalleryMessage('Cargando mascotas…')
+  const result = await listPets(API_OPTIONS)
+  if (!result.ok) {
+    petNav.replaceChildren()
+    galleryView.innerHTML = `<div class="gallery-message" role="alert"><p>${escapeHtml(result.message)}</p><button class="secondary-button" type="button" id="gallery-retry">Reintentar</button></div>`
+    galleryView.querySelector('#gallery-retry').addEventListener('click', loadGallery)
+    return
+  }
+
+  pets = result.pets
+  petNav.innerHTML = pets.map((pet) => `<a href="#galeria/${encodeURIComponent(pet.id)}">${escapeHtml(pet.name)}<span>Ver fotos</span></a>`).join('')
+  await renderGallery()
 }
 
-window.addEventListener('hashchange', renderRoute)
-renderRoute()
+window.addEventListener('hashchange', renderGallery)
+loadGallery()
 
 const menuToggle = document.querySelector('.menu-toggle')
 menuToggle.addEventListener('click', () => {

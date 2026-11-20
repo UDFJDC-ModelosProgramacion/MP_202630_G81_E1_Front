@@ -1,14 +1,10 @@
-import { pets } from '../gallery.js'
-import {
-  createPhoto,
-  deletePhoto,
-  getPhotos,
-  savePhoto,
-  setPrincipalPhoto,
-  updatePhoto,
-  validatePhoto,
-} from '../workflows/HU02.js'
+import { escapeHtml, getApiUrl } from '../api/client.js'
+import { createPhoto, deletePhoto, listPets, listPhotos, setPrincipalPhoto, updatePhoto } from '../workflows/story-api.js'
 import { mountAdminPage } from '../story-admin-page.js'
+
+const API_OPTIONS = { apiUrl: getApiUrl(import.meta.env), fetchFn: window.fetch.bind(window) }
+let pets = []
+let photos = []
 
 const root = mountAdminPage({
   storyId: 'HU02',
@@ -26,7 +22,7 @@ const root = mountAdminPage({
   },
   content: `
     <div class="admin-heading"><div><p class="step-label">HU02 · FICHA DE MASCOTA</p><h2>Fotografías registradas</h2><p>Agrega, edita, marca como principal o elimina imágenes.</p></div></div>
-    <div class="field admin-pet-filter"><label for="photo-pet">Mascota</label><select id="photo-pet">${pets.map((pet) => `<option value="${pet.id}">${pet.name}</option>`).join('')}</select></div>
+    <div class="field admin-pet-filter"><label for="photo-pet">Mascota</label><select id="photo-pet"><option value="">Cargando mascotas…</option></select></div>
     <p id="photo-feedback" class="admin-feedback" role="status" aria-live="polite"></p>
     <ul id="photo-list" class="admin-record-list" aria-label="Fotografías de la mascota"></ul>
     <form id="photo-form" class="admin-form" novalidate>
@@ -50,11 +46,10 @@ const descriptionInput = root.querySelector('#photo-description')
 const principalInput = root.querySelector('#photo-principal')
 
 function renderPhotos() {
-  const photos = getPhotos(window.localStorage, petSelect.value)
   list.innerHTML = photos.length ? photos.map((photo) => `
     <li class="admin-record photo-record">
-      <img src="${photo.url}" alt="${photo.description || `Foto de ${photo.petName}`}" loading="lazy">
-      <div class="admin-record-copy"><strong>${photo.description || 'Fotografía sin descripción'}</strong>${photo.principal ? '<span class="record-badge">Principal</span>' : ''}<small>${photo.url}</small></div>
+      <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.description || `Foto de ${photo.petName}`)}" loading="lazy">
+      <div class="admin-record-copy"><strong>${escapeHtml(photo.description || 'Fotografía sin descripción')}</strong>${photo.principal ? '<span class="record-badge">Principal</span>' : ''}<small>${escapeHtml(photo.url)}</small></div>
       <div class="admin-record-actions">
         ${photo.principal ? '' : `<button class="secondary-button" type="button" data-action="principal" data-id="${photo.id}">Marcar principal</button>`}
         <button class="secondary-button" type="button" data-action="edit" data-id="${photo.id}">Editar</button>
@@ -64,6 +59,25 @@ function renderPhotos() {
   `).join('') : '<li class="admin-empty">Esta mascota aún no tiene fotografías.</li>'
 }
 
+async function loadPhotos() {
+  list.innerHTML = '<li class="admin-empty">Cargando fotografías…</li>'
+  if (!petSelect.value) {
+    photos = []
+    renderPhotos()
+    return
+  }
+  const result = await listPhotos(petSelect.value, API_OPTIONS)
+  if (!result.ok) {
+    feedback.textContent = result.message
+    photos = []
+    list.innerHTML = '<li class="admin-empty">No fue posible cargar las fotografías.</li>'
+    return
+  } else {
+    photos = result.photos
+  }
+  renderPhotos()
+}
+
 function resetForm() {
   form.reset()
   idInput.value = ''
@@ -71,14 +85,14 @@ function resetForm() {
   root.querySelector('#photo-cancel').hidden = true
 }
 
-petSelect.addEventListener('change', renderPhotos)
+petSelect.addEventListener('change', loadPhotos)
 root.querySelector('#photo-cancel').addEventListener('click', resetForm)
-list.addEventListener('click', (event) => {
+list.addEventListener('click', async (event) => {
   const button = event.target.closest('button[data-action]')
   if (!button) return
   try {
     const { action, id } = button.dataset
-    const photo = getPhotos(window.localStorage, petSelect.value).find((item) => item.id === id)
+    const photo = photos.find((item) => String(item.id) === id)
     if (action === 'edit' && photo) {
       idInput.value = photo.id
       urlInput.value = photo.url
@@ -89,33 +103,66 @@ list.addEventListener('click', (event) => {
       urlInput.focus()
       return
     }
-    if (action === 'principal') setPrincipalPhoto(window.localStorage, petSelect.value, id)
-    if (action === 'delete') deletePhoto(window.localStorage, petSelect.value, id)
+    const result = action === 'principal'
+      ? await setPrincipalPhoto(petSelect.value, id, API_OPTIONS)
+      : await deletePhoto(petSelect.value, id, API_OPTIONS)
+    if (!result.ok) throw new Error(result.message)
     feedback.textContent = action === 'delete' ? 'Fotografía eliminada.' : 'Fotografía principal actualizada.'
-    renderPhotos()
+    await loadPhotos()
   } catch (error) {
     feedback.textContent = error.message
   }
 })
 
-form.addEventListener('submit', (event) => {
+form.addEventListener('submit', async (event) => {
   event.preventDefault()
-  const values = { petId: petSelect.value, url: urlInput.value, description: descriptionInput.value }
-  const errors = validatePhoto(values)
-  root.querySelector('#photo-url-error').textContent = errors.url ?? errors.petId ?? ''
-  if (Object.keys(errors).length) {
-    feedback.textContent = Object.values(errors)[0]
+  const values = { url: urlInput.value.trim(), description: descriptionInput.value.trim(), principal: principalInput.checked }
+  const error = !petSelect.value
+    ? 'Selecciona una mascota.'
+    : !/^https?:\/\/\S+$/i.test(values.url) ? 'Ingresa una URL válida para la fotografía.' : ''
+  root.querySelector('#photo-url-error').textContent = error
+  if (error) {
+    feedback.textContent = error
     return
   }
   try {
-    if (idInput.value) updatePhoto(window.localStorage, idInput.value, { ...values, principal: principalInput.checked })
-    else savePhoto(window.localStorage, createPhoto(values, { principal: principalInput.checked }))
-    feedback.textContent = 'Fotografía guardada.'
+    const shouldBePrincipal = values.principal
+      || (idInput.value ? photos.find((photo) => String(photo.id) === idInput.value)?.principal : photos.length === 0)
+    const photoValues = { ...values, principal: shouldBePrincipal }
+    let result = idInput.value
+      ? await updatePhoto(petSelect.value, idInput.value, photoValues, API_OPTIONS)
+      : await createPhoto(petSelect.value, photoValues, API_OPTIONS)
+    if (!result.ok) throw new Error(result.message)
+    if (shouldBePrincipal) {
+      const photoId = idInput.value || result.photo?.id
+      if (!photoId) throw new Error('El servidor no devolvió el identificador de la fotografía.')
+      result = await setPrincipalPhoto(petSelect.value, photoId, API_OPTIONS)
+      if (!result.ok) throw new Error(result.message)
+    }
     resetForm()
-    renderPhotos()
+    await loadPhotos()
+    feedback.textContent = 'Fotografía guardada.'
   } catch (error) {
     feedback.textContent = error.message
   }
 })
 
-renderPhotos()
+async function initialize() {
+  const result = await listPets(API_OPTIONS)
+  if (!result.ok) {
+    petSelect.innerHTML = '<option value="">No fue posible cargar las mascotas</option>'
+    feedback.textContent = result.message
+    list.innerHTML = '<li class="admin-empty">No fue posible cargar las fotografías.</li>'
+    return
+  }
+  pets = result.pets
+  petSelect.innerHTML = pets.map((pet) => `<option value="${escapeHtml(pet.id)}">${escapeHtml(pet.name)}</option>`).join('')
+  if (!pets.length) {
+    petSelect.innerHTML = '<option value="">No hay mascotas registradas</option>'
+    await loadPhotos()
+    return
+  }
+  await loadPhotos()
+}
+
+initialize()

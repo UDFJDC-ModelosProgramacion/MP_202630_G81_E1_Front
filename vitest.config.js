@@ -9,6 +9,7 @@ export default defineConfig({
       include: [
         'src/workflows/HU*.js',
         'src/workflows/storage.js',
+        'src/workflows/story-api.js',
         'src/catalog/catalog.js',
         'src/api/client.js',
       ],

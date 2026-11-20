@@ -1,6 +1,8 @@
 import '../style.css'
 import { renderStoryLinks } from '../story-navigation.js'
 import { renderStorySidebar } from '../story-sidebar.js'
+import { escapeHtml, getApiUrl } from '../api/client.js'
+import { listPets, listPhotos } from '../workflows/story-api.js'
 import {
   createApplication,
   getStoredApplications,
@@ -31,32 +33,23 @@ app.innerHTML = `
     <section class="home-view" id="home-view">
       <div class="home-hero">
         <div class="home-copy">
-          <p class="eyebrow"><span class="eyebrow-dot"></span> REFUGIO HUELLITAS · BOGOTÁ</p>
+          <p class="eyebrow"><span class="eyebrow-dot"></span> MASCOTAS QUE BUSCAN HOGAR</p>
           <h1>Una mirada puede <span>cambiarlo todo.</span></h1>
           <p>Conoce a quienes esperan un hogar. Mira sus historias, descubre sus personalidades y encuentra a tu nueva compañera de vida.</p>
-          <a class="home-primary-action" href="./HU01.html#galeria/mora">Conocer a Mora <span aria-hidden="true">→</span></a>
+          <a id="home-featured-link" class="home-primary-action" href="./HU33.html">Explorar mascotas <span aria-hidden="true">→</span></a>
         </div>
         <div class="home-hero-photo">
-          <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&q=85" alt="Perrita de pelaje dorado mirando a la cámara">
-          <span class="photo-caption"><span>EN ADOPCIÓN</span><strong>Mora, 2 años</strong></span>
+          <img id="home-featured-photo" alt="" hidden>
+          <span id="home-featured-placeholder" class="home-hero-placeholder" aria-hidden="true">🐾</span>
+          <span id="home-featured-caption" class="photo-caption" hidden><span></span><strong></strong></span>
         </div>
       </div>
       <div class="home-section-heading">
         <div><p class="step-label">UN HOGAR LOS ESPERA</p><h2>Historias por conocer</h2></div>
-        <a href="./HU01.html#galeria/mora">Ver galería <span aria-hidden="true">↗</span></a>
+        <a href="./HU33.html">Ver catálogo <span aria-hidden="true">↗</span></a>
       </div>
-      <div class="home-pet-list">
-        <article class="home-pet-row">
-          <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=400&q=80" alt="Retrato de Mora">
-          <div><span class="pet-status">EN ADOPCIÓN</span><h3>Mora</h3><p>Criolla · 2 años · Bogotá</p></div>
-          <a href="./HU01.html#galeria/mora" aria-label="Ver galería de Mora">Ver fotos <span aria-hidden="true">→</span></a>
-        </article>
-        <article class="home-pet-row pet-without-photo">
-          <div class="pet-initial" aria-hidden="true">L</div>
-          <div><span class="pet-status">EN ADOPCIÓN</span><h3>Luna</h3><p>Criolla · 1 año · Bogotá</p></div>
-          <a href="./HU01.html#galeria/luna" aria-label="Ver galería de Luna">Ver fotos <span aria-hidden="true">→</span></a>
-        </article>
-      </div>
+      <p id="home-data-feedback" class="home-data-feedback" role="status" aria-live="polite"></p>
+      <div id="home-pet-list" class="home-pet-list" aria-live="polite"></div>
       <section class="home-steps" id="proceso">
         <p class="step-label">UN PROCESO ACOMPAÑADO</p><h2>El primer paso empieza por conocerla.</h2>
         <a href="#solicitud">Iniciar solicitud de adopción <span aria-hidden="true">→</span></a>
@@ -237,11 +230,122 @@ app.innerHTML = `
 
 const homeView = document.querySelector('#home-view')
 const adoptionView = document.querySelector('#adoption-view')
+const homePetList = document.querySelector('#home-pet-list')
+const homeDataFeedback = document.querySelector('#home-data-feedback')
+const homeFeaturedLink = document.querySelector('#home-featured-link')
+const homeFeaturedPhoto = document.querySelector('#home-featured-photo')
+const homeFeaturedPlaceholder = document.querySelector('#home-featured-placeholder')
+const homeFeaturedCaption = document.querySelector('#home-featured-caption')
+const HOME_API_OPTIONS = { apiUrl: getApiUrl(import.meta.env), fetchFn: window.fetch.bind(window) }
+
+function isAdoptable(pet) {
+  return pet.status.toLocaleLowerCase('es') !== 'adoptado'
+}
+
+function formatHomeAge(age) {
+  if (age === null) return 'Edad no registrada'
+  if (age === 0) return 'Menos de 1 año'
+  return age === 1 ? '1 año' : `${age} años`
+}
+
+function statusLabel(status) {
+  if (status === 'Disponible') return 'EN ADOPCIÓN'
+  if (status === 'En proceso de adopcion') return 'EN PROCESO'
+  return status.toLocaleUpperCase('es')
+}
+
+function petGalleryHref(pet) {
+  return `./HU01.html#galeria/${encodeURIComponent(pet.id)}`
+}
+
+function renderHomePetRow(pet, photo) {
+  const name = escapeHtml(pet.name)
+  const image = photo
+    ? `<img src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.description || `Retrato de ${pet.name}`)}" loading="lazy">`
+    : `<div class="pet-initial" aria-hidden="true">${escapeHtml(name.slice(0, 1).toLocaleUpperCase('es'))}</div>`
+  const details = [pet.breed, formatHomeAge(pet.age), pet.location].filter(Boolean).map(escapeHtml).join(' · ')
+
+  return `<article class="home-pet-row">
+    ${image}
+    <div><span class="pet-status">${escapeHtml(statusLabel(pet.status))}</span><h3>${name}</h3><p>${details}</p></div>
+    <a href="${petGalleryHref(pet)}" aria-label="Ver galería de ${name}">Ver fotos <span aria-hidden="true">→</span></a>
+  </article>`
+}
+
+async function loadHomePets() {
+  homeDataFeedback.setAttribute('role', 'status')
+  homeDataFeedback.textContent = 'Cargando mascotas…'
+  homePetList.replaceChildren()
+
+  const result = await listPets(HOME_API_OPTIONS)
+  if (!result.ok) {
+    homeDataFeedback.setAttribute('role', 'alert')
+    homeDataFeedback.innerHTML = `${escapeHtml(result.message)} <button class="secondary-button" id="home-retry" type="button">Reintentar</button>`
+    homeDataFeedback.querySelector('#home-retry').addEventListener('click', loadHomePets)
+    homeFeaturedLink.hidden = true
+    homeFeaturedCaption.hidden = true
+    homeFeaturedPhoto.hidden = true
+    homeFeaturedPlaceholder.hidden = false
+    return
+  }
+
+  const pets = result.pets.filter(isAdoptable)
+  if (pets.length === 0) {
+    homeDataFeedback.textContent = 'No hay mascotas disponibles para adopción por el momento. Vuelve pronto.'
+    homeFeaturedLink.hidden = true
+    homeFeaturedCaption.hidden = true
+    homeFeaturedPhoto.hidden = true
+    homeFeaturedPlaceholder.hidden = false
+    return
+  }
+
+  const featuredPets = pets.slice(0, 3)
+  const photoResults = await Promise.all(featuredPets.map((pet) => listPhotos(pet.id, HOME_API_OPTIONS)))
+  const photosByPet = new Map()
+  const photoErrors = photoResults.filter((photoResult) => !photoResult.ok)
+  photoResults.forEach((photoResult, index) => {
+    if (photoResult.ok) {
+      const photos = photoResult.photos
+      photos.sort((first, second) => Number(second.principal) - Number(first.principal))
+      photosByPet.set(String(featuredPets[index].id), photos[0] ?? null)
+    }
+  })
+
+  const featuredPet = featuredPets[0]
+  const featuredPhoto = photosByPet.get(String(featuredPet.id))
+  homeFeaturedLink.href = petGalleryHref(featuredPet)
+  homeFeaturedLink.innerHTML = `Conocer a ${escapeHtml(featuredPet.name)} <span aria-hidden="true">→</span>`
+  homeFeaturedLink.hidden = false
+  homeFeaturedCaption.querySelector('span').textContent = statusLabel(featuredPet.status)
+  homeFeaturedCaption.querySelector('strong').textContent = `${featuredPet.name}, ${formatHomeAge(featuredPet.age)}`
+  homeFeaturedCaption.hidden = false
+  if (featuredPhoto) {
+    homeFeaturedPhoto.src = featuredPhoto.url
+    homeFeaturedPhoto.alt = featuredPhoto.description || `Fotografía de ${featuredPet.name}`
+    homeFeaturedPhoto.hidden = false
+    homeFeaturedPlaceholder.hidden = true
+  } else {
+    homeFeaturedPhoto.hidden = true
+    homeFeaturedPlaceholder.textContent = featuredPet.name.slice(0, 1).toLocaleUpperCase('es')
+    homeFeaturedPlaceholder.hidden = false
+  }
+
+  homePetList.innerHTML = featuredPets.map((pet) =>
+    renderHomePetRow(pet, photosByPet.get(String(pet.id))),
+  ).join('')
+  if (photoErrors.length > 0) {
+    homeDataFeedback.setAttribute('role', 'alert')
+    homeDataFeedback.textContent = 'No fue posible cargar algunas fotografías; puedes consultar las galerías para volver a intentarlo.'
+  } else {
+    homeDataFeedback.textContent = ''
+  }
+}
 
 function renderRoute() {
   const [route, petId] = window.location.hash.slice(1).split('/')
   homeView.hidden = route !== 'inicio' && route !== ''
   adoptionView.hidden = route !== 'solicitud'
+  if (!homeView.hidden) loadHomePets()
 }
 
 window.addEventListener('hashchange', renderRoute)
