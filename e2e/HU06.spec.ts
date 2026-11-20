@@ -1,17 +1,32 @@
 import { expect, test } from '@playwright/test'
+import { mockStoryApi } from './story-api'
 
-test('HU06 displays success stories and empty or inactive states', async ({ page }) => {
+test('displays public stories, empty and inactive states from the backend', async ({ page }) => {
+  await mockStoryApi(page, {
+    stories: {
+      1: [{
+        id: 21, mascotaId: 1, mascota: { id: 1, nombre: 'Mora' }, titulo: 'Mora ya tiene hogar',
+        descripcion: 'Una familia la recibió con cariño.', fecha: '2026-03-10',
+      }],
+      2: [],
+    },
+  })
   await page.goto('/HU06.html')
-  await page.evaluate(() => localStorage.setItem('huellitas.successStories', JSON.stringify([
-    { id: 'story-1', petId: 'mora', petName: 'Mora', title: 'Luna ya tiene hogar', description: 'Una familia la recibió con cariño.', createdAt: '2026-03-10T12:00:00.000Z' },
-  ])))
-  await page.reload()
-  await expect(page.locator('.story-record')).toContainText('Luna ya tiene hogar')
+  await expect(page.locator('.story-record')).toContainText('Mora ya tiene hogar')
   await expect(page.locator('.story-record')).toContainText('2026-03-10')
 
-  await page.getByLabel('Mascota').selectOption('luna')
+  await page.getByLabel('Mascota').selectOption('2')
   await expect(page.getByRole('status')).toContainText('aún no tiene historias')
-  await page.evaluate(() => localStorage.setItem('huellitas.petRegistry', JSON.stringify([{ petName: 'Mora', status: 'Inactiva' }])))
-  await page.getByLabel('Mascota').selectOption('mora')
+})
+
+test('shows an inactive pet message based on backend status', async ({ page }) => {
+  await mockStoryApi(page, {
+    pets: [
+      { id: 1, nombre: 'Mora', especie: 'Perro', raza: 'Criolla', edad: 2, estado: 'Inactivo', refugio: { ciudad: 'Bogotá' } },
+      { id: 2, nombre: 'Luna', especie: 'Gato', raza: 'Criolla', edad: 1, estado: 'Disponible', refugio: { ciudad: 'Bogotá' } },
+    ],
+  })
+  await page.goto('/HU06.html')
+  await page.getByLabel('Mascota').selectOption('1')
   await expect(page.getByRole('status')).toContainText('mascota está inactiva')
 })

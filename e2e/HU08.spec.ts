@@ -1,18 +1,26 @@
 import { expect, test } from '@playwright/test'
+import { mockStoryApi } from './story-api'
 
-test('HU08 marks selected messages read and prevents deleting read messages', async ({ page }) => {
+test('marks backend messages read/unread and prevents deleting read messages', async ({ page }) => {
+  const api = await mockStoryApi(page, {
+    messages: [
+      { id: 31, adoptanteId: 10, mascotaId: 1, mascota: { id: 1, nombre: 'Mora' }, asunto: 'Pregunta sobre vacunas', contenido: 'Consulta', fecha: '2026-03-10', leido: false },
+      { id: 32, adoptanteId: 10, mascotaId: 2, mascota: { id: 2, nombre: 'Luna' }, asunto: 'Horario de visita', contenido: 'Consulta', fecha: '2026-03-11', leido: false },
+    ],
+  })
   await page.goto('/HU08.html')
-  await page.evaluate(() => localStorage.setItem('huellitas.messages', JSON.stringify([
-    { id: 'message-1', adopterId: 'samuel', petId: 'mora', petName: 'Mora', subject: 'Pregunta sobre vacunas', content: 'Consulta', createdAt: '2026-03-10T12:00:00.000Z', read: false },
-    { id: 'message-2', adopterId: 'samuel', petId: 'luna', petName: 'Luna', subject: 'Horario de visita', content: 'Consulta', createdAt: '2026-03-11T12:00:00.000Z', read: false },
-  ])))
-  await page.reload()
   await page.getByLabel('Seleccionar Pregunta sobre vacunas').check()
   await page.getByLabel('Seleccionar Horario de visita').check()
   await page.locator('#mark-selected-read').click()
   await expect(page.getByRole('status')).toContainText('Mensajes marcados como leídos')
   await expect(page.locator('.message-record .record-badge')).toHaveText(['Leído', 'Leído'])
+  expect(api.messages.every((message) => message.leido === true)).toBe(true)
 
+  const readDelete = page.locator('.message-record').filter({ hasText: 'Pregunta sobre vacunas' }).getByRole('button', { name: 'Eliminar' })
+  await expect(readDelete).toBeDisabled()
+  await page.locator('.message-record').filter({ hasText: 'Pregunta sobre vacunas' }).getByRole('button', { name: 'Marcar como no leído' }).click()
+  await expect(api.messages[0].leido).toBe(false)
   await page.locator('.message-record').filter({ hasText: 'Pregunta sobre vacunas' }).getByRole('button', { name: 'Eliminar' }).click()
-  await expect(page.getByRole('status')).toContainText('no puede eliminarse')
+  await expect(page.locator('.message-record')).toHaveCount(1)
+  expect(api.messages).toHaveLength(1)
 })

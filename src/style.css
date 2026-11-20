@@ -412,6 +412,24 @@ main,
   object-position: center 45%;
 }
 
+.home-hero-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgba(36, 54, 47, 0.6);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 112px;
+}
+
+.home-data-feedback {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.home-data-feedback:empty { display: none; }
+
 .photo-caption {
   position: absolute;
   right: 22px;

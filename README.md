@@ -2,7 +2,7 @@
 
 Interfaz frontend para las historias HU01–HU17, HU18–HU21, HU30 y HU33. Cada historia tiene una página separada y comparte el estilo visual de Huellitas.
 
-Los datos de HU01–HU08 y HU18–HU21 se guardan en `localStorage` como demostración; no se conectan a un backend. HU01 presenta la galería fotográfica y HU33 conserva la integración del catálogo con el API.
+HU01–HU08 y HU09–HU17 consultan y actualizan los registros del backend. La portada de HU18 consulta mascotas y fotografías del backend; el formulario de solicitud y HU19–HU21 conservan almacenamiento local de demostración. HU01 comparte los datos de mascotas con el catálogo HU33.
 
 ## Tecnologías
 
@@ -34,35 +34,37 @@ Usa el identificador `HUxx` en todos los archivos de la historia: crea `HUxx.htm
 
 ## HU01 — Galería de fotos
 
-Página `HU01.html` que presenta las fotos por mascota, coloca primero la fotografía principal y muestra estados para mascotas sin fotos o no encontradas. La galería se abre desde las historias de adopción y permite pasar entre mascotas.
+Página `HU01.html` que consulta `GET {API}/mascotas` y `GET {API}/mascotas/{id}/fotografias`. Muestra únicamente las mascotas y fotografías registradas en el backend, colocando primero la fotografía principal.
 
 ## HU02 — Gestionar fotografías
 
-Página `HU02.html` para agregar, editar y eliminar fotos por mascota, marcar una imagen principal y sincronizar los cambios con la galería HU01. Los cambios se guardan localmente.
+Página `HU02.html` para agregar, editar y eliminar fotos por mascota, marcar una imagen principal y sincronizar los cambios con la galería HU01. Usa las rutas `/mascotas/{id}/fotografias` del API.
 
 ## HU03 — Registrar eventos de vida
 
-Página `HU03.html` para registrar y editar eventos de nacimiento, vacunación, enfermedad, adopción o muerte. Rechaza tipos no permitidos, fechas inválidas o futuras y sincroniza los registros con HU04.
+Página `HU03.html` para registrar y editar eventos de nacimiento, vacunación, enfermedad, adopción o muerte. Rechaza tipos no permitidos, fechas inválidas o futuras y sincroniza los registros con HU04 mediante `/mascotas/{id}/eventos-vida`.
 
 ## HU04 — Consultar línea de tiempo
 
-Página `HU04.html` que combina eventos y registros de adopción/devolución, los ordena cronológicamente y permite filtrar por tipo y rango de fechas. Acepta `?mascota=<id>` y muestra un error si no existe la mascota.
+Página `HU04.html` que combina eventos de vida, adopciones y retornos consultados al backend, los ordena cronológicamente y permite filtrar por tipo y rango de fechas. Acepta `?mascota=<id>`.
 
 ## HU05 — Publicar historias de éxito
 
-Página `HU05.html` para crear, editar y eliminar historias con título y descripción. Solo permite publicar o editar historias cuyo registro de mascota no esté marcado como inactivo o retirado.
+Página `HU05.html` para crear, editar y eliminar historias con título y descripción usando `/mascotas/{id}/historias-exito`. Solo permite publicar o editar historias de mascotas activas.
 
 ## HU06 — Consultar historias de éxito
 
-Página `HU06.html` para consultar los relatos publicados de una mascota. Muestra título, descripción y fecha, además de estados para mascotas inexistentes o inactivas y mascotas sin historias.
+Página `HU06.html` para consultar en el backend los relatos publicados de una mascota. Muestra título, descripción y fecha, además de estados para mascotas inexistentes o inactivas y mascotas sin historias.
 
 ## HU07 — Enviar y recibir mensajes
 
-Página `HU07.html` para consultar la bandeja del adoptante y enviar mensajes asociados a una mascota. Permite editar o eliminar mensajes propios no leídos; los registros de demostración se asocian al adoptante Samuel.
+Página `HU07.html` para consultar la bandeja del adoptante y enviar mensajes asociados a una mascota usando `/adoptantes/{id}/mensajes`. Permite editar o eliminar mensajes propios no leídos. El ID de adoptante se obtiene del registro realizado en HU09.
 
 ## HU08 — Organizar mensajes
 
-Página `HU08.html` para marcar mensajes propios como leídos o no leídos, individualmente o en grupo. No permite organizar mensajes de otro adoptante ni eliminar un mensaje ya leído.
+Página `HU08.html` para marcar mensajes del backend como leídos o no leídos, individualmente o en grupo. No permite organizar mensajes de otro adoptante ni eliminar un mensaje ya leído.
+
+Para HU01–HU08, inicia el backend en `http://localhost:8080` (o configura `VITE_API_URL` como se describe en HU33). HU07 y HU08 requieren registrar primero un adoptante desde HU09 en el mismo navegador para asociar la bandeja con su ID real.
 
 ## HU33 — Catálogo de mascotas
 
