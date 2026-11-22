@@ -6,7 +6,7 @@ import {
   createUpdate,
   getStoredUpdates,
   saveUpdate,
-} from '../src/actualizaciones.js'
+} from '../src/workflows/HU22.js'
 
 const validUpdate = {
   targetType: 'mascota',

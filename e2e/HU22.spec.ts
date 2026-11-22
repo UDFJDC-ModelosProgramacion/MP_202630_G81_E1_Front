@@ -1,8 +1,7 @@
-
 import { expect, test } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/actualizaciones.html')
+  await page.goto('/HU22.html')
   await page.evaluate(() => localStorage.clear())
   await page.reload()
 })

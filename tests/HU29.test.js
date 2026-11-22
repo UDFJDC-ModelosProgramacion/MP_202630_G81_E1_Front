@@ -282,3 +282,27 @@ describe('HU29 - cobertura adicional', () => {
       .rejects.toThrow('Debe ingresar el ID del evento médico.');
   });
 });
+describe('HU29 - Configuracion de la API', () => {
+  it('utiliza la URL predeterminada cuando no hay configuracion', async () => {
+    vi.stubEnv('VITE_API_URL', '');
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: async () => '[]',
+    });
+
+    vi.stubGlobal('fetch', mockFetch);
+
+    try {
+      expect(await getPets()).toEqual([]);
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        'http://localhost:8080/api/mascotas',
+      );
+    } finally {
+      vi.unstubAllEnvs();
+      vi.unstubAllGlobals();
+    }
+  });
+});

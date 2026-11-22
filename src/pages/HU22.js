@@ -1,68 +1,14 @@
+import '../style.css'
+import '../HU22.css'
 
-export const STORAGE_KEY = 'huellitas.actualizaciones'
+import {
+  validateUpdate,
+  createUpdate,
+  getStoredUpdates,
+  saveUpdate,
+} from '../workflows/HU22.js'
 
-export function validateUpdate(values) {
-  const errors = {}
-  const value = (field) =>
-    typeof values[field] === 'string' ? values[field].trim() : ''
-
-  if (!['mascota', 'adoptante'].includes(value('targetType'))) {
-    errors.targetType = 'Selecciona una mascota o un adoptante.'
-  }
-
-  if (!value('targetId')) {
-    errors.targetId = 'Escribe el identificador correspondiente.'
-  }
-
-  if (!value('title')) {
-    errors.title = 'Escribe el título de la actualización.'
-  }
-
-  if (!value('description')) {
-    errors.description = 'Escribe la descripción de la actualización.'
-  }
-
-  return errors
-}
-
-export function createUpdate(
-  values,
-  {
-    id = globalThis.crypto.randomUUID(),
-    createdAt = new Date().toISOString(),
-  } = {},
-) {
-  return {
-    id,
-    createdAt,
-    targetType: values.targetType.trim(),
-    targetId: values.targetId.trim(),
-    title: values.title.trim(),
-    description: values.description.trim(),
-  }
-}
-
-export function getStoredUpdates(storage) {
-  const stored = storage.getItem(STORAGE_KEY)
-
-  if (stored === null) return []
-
-  const updates = JSON.parse(stored)
-
-  if (!Array.isArray(updates)) {
-    throw new TypeError('Las actualizaciones guardadas deben ser una lista.')
-  }
-
-  return updates
-}
-
-export function saveUpdate(update, storage) {
-  const updates = getStoredUpdates(storage)
-  updates.push(update)
-  storage.setItem(STORAGE_KEY, JSON.stringify(updates))
-}
-
-
+// Mostramos los errores de cada campo del formulario.
 function showErrors(errors) {
   const fields = {
     targetType: ['#target-type', '#target-type-error'],
@@ -76,22 +22,29 @@ function showErrors(errors) {
     const error = document.querySelector(errorSelector)
 
     if (!input || !error) {
-      console.error(`No se encontró el campo o mensaje de error: ${field}`)
+      console.error(`No se encontró el campo: ${field}`)
       continue
     }
 
-    input.setAttribute('aria-invalid', String(Boolean(errors[field])))
+    input.setAttribute(
+      'aria-invalid',
+      String(Boolean(errors[field])),
+    )
+
     error.textContent = errors[field] ?? ''
   }
 }
 
-
+// Aca cogemos las actualizaciones almacenadas y
+// las mostramos en la parte del historial de la pagina.
 function renderUpdates() {
   const list = document.querySelector('#updates-list')
   const emptyState = document.querySelector('#empty-state')
+
   const updates = getStoredUpdates(window.localStorage)
 
   list.replaceChildren()
+
   emptyState.hidden = updates.length > 0
 
   for (const update of updates) {
@@ -101,15 +54,20 @@ function renderUpdates() {
     const reference = document.createElement('p')
 
     heading.textContent = update.title
+
     description.textContent = update.description
+
     reference.textContent =
       `${update.targetType}: ${update.targetId} · ${update.createdAt}`
 
     item.append(heading, description, reference)
+
     list.append(item)
   }
 }
 
+// Inicializamos la pagina y escuchamos cuando
+// el usuario presiona el boton de registrar.
 function initializeUpdatesPage() {
   const form = document.querySelector('#update-form')
 
@@ -120,8 +78,12 @@ function initializeUpdatesPage() {
   form.addEventListener('submit', (event) => {
     event.preventDefault()
 
-    const values = Object.fromEntries(new FormData(form).entries())
+    const values = Object.fromEntries(
+      new FormData(form).entries(),
+    )
+
     const errors = validateUpdate(values)
+
     showErrors(errors)
 
     const feedback = document.querySelector('#form-feedback')
@@ -130,24 +92,31 @@ function initializeUpdatesPage() {
     success.hidden = true
     feedback.textContent = ''
 
+    // Si hay errores no dejamos registrar la informacion.
     if (Object.keys(errors).length > 0) {
       feedback.textContent = 'Revisa los campos marcados.'
+
       form.querySelector('[aria-invalid="true"]')?.focus()
+
       return
     }
 
+    // Creamos y guardamos la actualizacion.
     const update = createUpdate(values)
+
     saveUpdate(update, window.localStorage)
 
     form.reset()
+
     showErrors({})
+
     renderUpdates()
 
-    success.textContent = 'La actualización se registró correctamente.'
+    success.textContent =
+      'La actualización se registró correctamente.'
+
     success.hidden = false
   })
 }
 
-if (typeof document !== 'undefined') {
-  initializeUpdatesPage()
-}
+initializeUpdatesPage()

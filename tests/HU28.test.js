@@ -462,3 +462,28 @@ describe('HU28 - cobertura adicional', () => {
     });
   });
 });
+describe('HU28 - Configuracion de la API', () => {
+  it('utiliza la URL predeterminada cuando no hay configuracion', async () => {
+    vi.stubEnv('VITE_API_URL', '');
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: async () => '[]',
+    });
+
+    vi.stubGlobal('fetch', mockFetch);
+
+    try {
+      expect(await getMedicalEvents()).toEqual([]);
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        'http://localhost:8080/api/eventos-medicos',
+        expect.any(Object),
+      );
+    } finally {
+      vi.unstubAllEnvs();
+      vi.unstubAllGlobals();
+    }
+  });
+});
