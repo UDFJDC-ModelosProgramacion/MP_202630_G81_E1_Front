@@ -55,3 +55,32 @@ test('registers and displays an update', async ({ page }) => {
     title: 'Seguimiento de adaptación',
   })
 })
+test('opens and closes the navigation menu', async ({ page }) => {
+
+  await page.setViewportSize({
+    width: 390,
+    height: 844,
+  })
+
+  const menu = page.locator('.menu-toggle')
+
+  await menu.click()
+
+  await expect(menu)
+    .toHaveAttribute('aria-expanded', 'true')
+
+  await expect(page.locator('.header-nav'))
+    .toHaveClass(/nav-open/)
+
+  await expect(
+    page.locator('#primary-navigation a[href$="HU23.html"]'),
+  ).toBeVisible()
+
+  await menu.click()
+
+  await expect(menu)
+    .toHaveAttribute('aria-expanded', 'false')
+
+  await expect(page.locator('.header-nav'))
+    .not.toHaveClass(/nav-open/)
+})
