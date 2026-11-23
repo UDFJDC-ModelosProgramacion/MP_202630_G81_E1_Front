@@ -1,115 +1,243 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HU28 - Eventos médicos</title>
-  <link rel="stylesheet" href="./HU28.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Registro y administración de eventos médicos de las mascotas en Huellitas."
+  />
+  <title>HU28 · Eventos médicos | Huellitas</title>
 </head>
+
 <body>
-  <main class="container">
-    <header>
-      <h1>Registro de eventos médicos</h1>
-      <p>Registra y actualiza la información médica de las mascotas.</p>
-    </header>
+  <header class="site-header mx-auto flex items-center justify-between">
+    <a class="brand" href="./HU01.html" aria-label="Huellitas, inicio">
+      <span class="brand-mark" aria-hidden="true">🐾</span>
+      <span>huellitas<span class="brand-dot">.</span></span>
+    </a>
 
-    <section class="panel">
-      <h2>Registrar evento médico</h2>
+    <nav
+      class="header-nav"
+      id="primary-navigation"
+      aria-label="Navegación principal"
+    ></nav>
 
-      <p id="feedback" role="status" aria-live="polite"></p>
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-label="Abrir navegación"
+      aria-controls="primary-navigation"
+      aria-expanded="false"
+    >
+      <span></span>
+      <span></span>
+    </button>
+  </header>
 
-      <form id="event-form">
-        <label>
-          Mascota
-          <select id="pet" required>
-            <option value="">Seleccione una mascota</option>
-          </select>
-        </label>
+  <main class="mx-auto w-full hu28-main">
+    <div class="story-layout">
+      <div class="story-primary">
 
-        <label>
-          Fecha
-          <input id="date" type="date" required>
-        </label>
+        <header class="hu28-intro">
+          <p class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            HUELLITAS · SALUD Y BIENESTAR
+          </p>
 
-        <label>
-          Descripción
-          <textarea id="description" required maxlength="1000"></textarea>
-        </label>
+          <h1>Registro de eventos médicos</h1>
 
-        <label>
-          Diagnóstico
-          <textarea id="diagnosis" required maxlength="1000"></textarea>
-        </label>
+          <p>
+            Registra y actualiza la información médica de las mascotas.
+            Mantén organizados sus diagnósticos, tratamientos y eventos de salud.
+          </p>
+        </header>
 
-        <label>
-          Tratamiento
-          <textarea id="treatment" required maxlength="1000"></textarea>
-        </label>
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
+          <a href="./HU01.html">Huellitas</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">HU28 · Eventos médicos</span>
+        </nav>
 
-        <button type="submit" id="save-button">Registrar evento</button>
-      </form>
-    </section>
+        <section class="hu28-panel" aria-labelledby="hu28-create-title">
+          <div class="hu28-section-heading">
+            <p class="hu28-eyebrow">HISTORIAL DE SALUD</p>
+            <h2 id="hu28-create-title">Registrar evento médico</h2>
+            <p>
+              Completa los datos del evento para guardar
+              la información médica de la mascota.
+            </p>
+          </div>
 
-    <section class="panel">
-      <div class="section-heading">
-        <h2>Eventos médicos registrados</h2>
-        <button type="button" id="reload-button" class="secondary">
-          Actualizar
-        </button>
+          <p id="feedback" role="status" aria-live="polite"></p>
+
+          <form id="event-form">
+            <label>
+              Mascota
+              <select id="pet" required>
+                <option value="">Seleccione una mascota</option>
+              </select>
+            </label>
+
+            <label>
+              Fecha
+              <input id="date" type="date" required />
+            </label>
+
+            <label class="hu28-full-field">
+              Descripción
+              <textarea
+                id="description"
+                required
+                maxlength="1000"
+                placeholder="Describe el evento médico realizado..."
+              ></textarea>
+            </label>
+
+            <label class="hu28-full-field">
+              Diagnóstico
+              <textarea
+                id="diagnosis"
+                required
+                maxlength="1000"
+                placeholder="Escribe el diagnóstico de la mascota..."
+              ></textarea>
+            </label>
+
+            <label class="hu28-full-field">
+              Tratamiento
+              <textarea
+                id="treatment"
+                required
+                maxlength="1000"
+                placeholder="Indica el tratamiento correspondiente..."
+              ></textarea>
+            </label>
+
+            <div class="hu28-form-actions">
+              <button type="submit" id="save-button">
+                Registrar evento
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="hu28-panel" aria-labelledby="hu28-list-title">
+          <div class="section-heading">
+            <div class="hu28-section-heading">
+              <p class="hu28-eyebrow">CONSULTA DE REGISTROS</p>
+              <h2 id="hu28-list-title">Eventos médicos registrados</h2>
+            </div>
+
+            <button
+              type="button"
+              id="reload-button"
+              class="secondary"
+            >
+              Actualizar
+            </button>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Mascota</th>
+                  <th>Fecha</th>
+                  <th>Descripción</th>
+                  <th>Diagnóstico</th>
+                  <th>Tratamiento</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+
+              <tbody id="events-list">
+                <tr>
+                  <td colspan="7">Cargando eventos médicos...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section
+          class="hu28-panel"
+          id="edit-panel"
+          aria-labelledby="hu28-edit-title"
+          hidden
+        >
+          <div class="hu28-section-heading">
+            <p class="hu28-eyebrow">ACTUALIZAR HISTORIAL</p>
+            <h2 id="hu28-edit-title">Editar evento médico</h2>
+            <p>
+              Modifica el diagnóstico, la descripción o el tratamiento
+              y guarda los cambios.
+            </p>
+          </div>
+
+          <form id="edit-form" novalidate>
+            <input type="hidden" id="edit-id" />
+
+            <label>
+              Descripción
+              <textarea
+                id="edit-description"
+                required
+                maxlength="1000"
+              ></textarea>
+            </label>
+
+            <label>
+              Diagnóstico
+              <textarea
+                id="edit-diagnosis"
+                required
+                maxlength="1000"
+              ></textarea>
+            </label>
+
+            <label>
+              Tratamiento
+              <textarea
+                id="edit-treatment"
+                required
+                maxlength="1000"
+              ></textarea>
+            </label>
+
+            <div class="form-actions">
+              <button type="submit">
+                Guardar cambios
+              </button>
+
+              <button
+                type="button"
+                id="cancel-edit"
+                class="secondary"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </section>
+
       </div>
 
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Mascota</th>
-              <th>Fecha</th>
-              <th>Descripción</th>
-              <th>Diagnóstico</th>
-              <th>Tratamiento</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="events-list">
-            <tr>
-              <td colspan="7">Cargando eventos médicos...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="panel" id="edit-panel" hidden>
-      <h2>Editar evento médico</h2>
-
-      <form id="edit-form" novalidate>
-        <input type="hidden" id="edit-id">
-
-        <label>
-          Descripción
-          <textarea id="edit-description" required maxlength="1000"></textarea>
-        </label>
-
-        <label>
-          Diagnóstico
-          <textarea id="edit-diagnosis" required maxlength="1000"></textarea>
-        </label>
-
-        <label>
-          Tratamiento
-          <textarea id="edit-treatment" required maxlength="1000"></textarea>
-        </label>
-
-        <div class="form-actions">
-          <button type="submit">Guardar cambios</button>
-          <button type="button" id="cancel-edit" class="secondary">
-            Cancelar
-          </button>
-        </div>
-      </form>
-    </section>
+      <div id="hu28-sidebar"></div>
+    </div>
   </main>
+
+  <footer class="site-footer mx-auto flex items-center justify-between">
+    <a class="brand footer-brand" href="./HU01.html">
+      <span class="brand-mark" aria-hidden="true">🐾</span>
+      <span>huellitas<span class="brand-dot">.</span></span>
+    </a>
+
+    <p>Con amor, cada historia encuentra su hogar.</p>
+    <span>© 2026 Huellitas</span>
+  </footer>
 
   <script type="module" src="./src/pages/HU28.js"></script>
 </body>

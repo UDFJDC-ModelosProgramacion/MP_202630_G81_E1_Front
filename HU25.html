@@ -1,71 +1,205 @@
+
 <!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Consulta y filtra las reseñas de las mascotas." />
-    <title>HU25 - Consultar reseñas | AdoptaPet</title>
+    <meta
+      name="description"
+      content="Consulta y filtra las reseñas de las mascotas en Huellitas."
+    />
+    <title>HU25 · Consultar reseñas | Huellitas</title>
   </head>
+
   <body>
-    <header class="reviews-header">
-      <div class="reviews-container">
-        <a class="brand" href="/HU25.html">AdoptaPet</a>
-        <nav id="story-navigation" class="story-navigation"
-          aria-label="Navegación de historias"></nav>
-      </div>
+    <header class="site-header mx-auto flex items-center justify-between">
+      <a class="brand" href="./HU01.html" aria-label="Huellitas, inicio">
+        <span class="brand-mark" aria-hidden="true">🐾</span>
+        <span>huellitas<span class="brand-dot">.</span></span>
+      </a>
+
+      <nav
+        class="header-nav"
+        id="primary-navigation"
+        aria-label="Navegación principal"
+      ></nav>
+
+      <button
+        class="menu-toggle"
+        type="button"
+        aria-label="Abrir navegación"
+        aria-controls="primary-navigation"
+        aria-expanded="false"
+      >
+        <span></span><span></span>
+      </button>
     </header>
 
-    <main class="reviews-container">
-      <section aria-labelledby="reviews-title">
-        <p class="eyebrow">OPINIONES DE NUESTRA COMUNIDAD</p>
-        <h1 id="reviews-title">Consultar reseñas</h1>
-        <p>Consulta las experiencias y opiniones sobre nuestras mascotas.</p>
+    <main class="mx-auto w-full hu25-main">
+      <div class="story-layout">
+        <div class="story-primary">
 
-        <form id="review-filters">
-          <div class="field">
-            <label for="pet-id">ID de la mascota</label>
-            <input id="pet-id" type="number" min="1" placeholder="Ej. 1" />
-          </div>
+          <section class="gallery-intro">
+            <p class="eyebrow">
+              <span class="eyebrow-dot"></span>
+              HUELLITAS · EXPERIENCIAS
+            </p>
+            <h1 id="reviews-title">Cada experiencia cuenta.</h1>
+            <p>
+              Consulta las reseñas de nuestra comunidad y conoce
+              las experiencias relacionadas con las mascotas.
+            </p>
+          </section>
 
-          <div class="field">
-            <label for="rating">Calificación</label>
-            <select id="rating">
-              <option value="">Todas las calificaciones</option>
-              <option value="5">5 estrellas</option>
-              <option value="4">4 estrellas</option>
-              <option value="3">3 estrellas</option>
-              <option value="2">2 estrellas</option>
-              <option value="1">1 estrella</option>
-            </select>
-          </div>
+          <nav class="breadcrumb" aria-label="Ruta de navegación">
+            <a href="./HU01.html">Huellitas</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">HU25 · Consultar reseñas</span>
+          </nav>
 
-          <div class="field">
-            <label for="adopter-id">ID del adoptante</label>
-            <input id="adopter-id" type="number" min="1" placeholder="Ej. 1" />
-          </div>
+          <section class="hu25-panel" aria-labelledby="filters-title">
+            <div class="hu25-section-heading">
+              <p class="step-label">HU25 · CONSULTA DE RESEÑAS</p>
+              <h2 id="filters-title">Encuentra una reseña</h2>
+              <p>
+                Utiliza los filtros para consultar las opiniones
+                registradas por nuestra comunidad.
+              </p>
+            </div>
 
-          <button type="submit" id="search-reviews">Consultar</button>
-          <button type="button" id="clear-filters">Limpiar</button>
-        </form>
+            <form id="review-filters" class="hu25-filters">
+              <div class="field">
+                <label for="pet-id">ID de la mascota</label>
+                <input
+                  id="pet-id"
+                  type="number"
+                  min="1"
+                  placeholder="Ej. 1"
+                />
+              </div>
 
-        <div id="loading" role="status" hidden>Consultando reseñas...</div>
-        <div id="error" role="alert" hidden></div>
-        <div id="empty" role="status" hidden>
-          Esta mascota aún no tiene reseñas.
+              <div class="field">
+                <label for="rating">Calificación</label>
+                <select id="rating">
+                  <option value="">Todas las calificaciones</option>
+                  <option value="5">5 estrellas</option>
+                  <option value="4">4 estrellas</option>
+                  <option value="3">3 estrellas</option>
+                  <option value="2">2 estrellas</option>
+                  <option value="1">1 estrella</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="adopter-id">ID del adoptante</label>
+                <input
+                  id="adopter-id"
+                  type="number"
+                  min="1"
+                  placeholder="Ej. 1"
+                />
+              </div>
+
+              <div class="hu25-actions">
+                <button
+                  class="hu25-primary-button"
+                  type="submit"
+                  id="search-reviews"
+                >
+                  Consultar reseñas
+                </button>
+
+                <button
+                  class="hu25-secondary-button"
+                  type="button"
+                  id="clear-filters"
+                >
+                  Limpiar filtros
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section class="hu25-panel" aria-labelledby="results-title">
+            <div class="hu25-section-heading">
+              <p class="step-label">OPINIONES COMPARTIDAS</p>
+              <h2 id="results-title">Reseñas disponibles</h2>
+            </div>
+
+            <div id="loading" role="status" hidden>
+              Consultando reseñas...
+            </div>
+
+            <div id="error" role="alert" hidden></div>
+
+            <div id="empty" role="status" hidden>
+              Esta mascota aún no tiene reseñas.
+            </div>
+
+            <p id="results-summary" aria-live="polite"></p>
+
+            <ul
+              id="review-list"
+              aria-label="Lista de reseñas"
+            ></ul>
+          </section>
+
+          <section
+            class="hu25-panel"
+            aria-labelledby="single-review-title"
+          >
+            <div class="hu25-section-heading">
+              <p class="step-label">CONSULTA INDIVIDUAL</p>
+              <h2 id="single-review-title">
+                Consultar reseña por ID
+              </h2>
+              <p>
+                Busca una reseña específica utilizando
+                su identificador.
+              </p>
+            </div>
+
+            <div class="hu25-single-search">
+              <div class="field">
+                <label for="review-id">ID de la reseña</label>
+                <input
+                  id="review-id"
+                  type="number"
+                  min="1"
+                  placeholder="Ej. 1"
+                />
+              </div>
+
+              <button
+                class="hu25-primary-button"
+                type="button"
+                id="search-review-by-id"
+              >
+                Buscar reseña
+              </button>
+            </div>
+
+            <div
+              id="single-review-result"
+              aria-live="polite"
+            ></div>
+          </section>
+
         </div>
 
-        <p id="results-summary" aria-live="polite"></p>
-        <ul id="review-list" aria-label="Lista de reseñas"></ul>
-
-        <section aria-labelledby="single-review-title">
-          <h2 id="single-review-title">Consultar reseña por ID</h2>
-          <label for="review-id">ID de la reseña</label>
-          <input id="review-id" type="number" min="1" placeholder="Ej. 1" />
-          <button type="button" id="search-review-by-id">Buscar reseña</button>
-          <div id="single-review-result" aria-live="polite"></div>
-        </section>
-      </section>
+        <div id="hu25-sidebar"></div>
+      </div>
     </main>
+
+    <footer class="site-footer mx-auto flex items-center justify-between">
+      <a class="brand footer-brand" href="./HU01.html">
+        <span class="brand-mark" aria-hidden="true">🐾</span>
+        <span>huellitas<span class="brand-dot">.</span></span>
+      </a>
+      <p>Con amor, cada historia encuentra su hogar.</p>
+      <span>© 2026 Huellitas</span>
+    </footer>
 
     <script type="module" src="/src/pages/HU25.js"></script>
   </body>

@@ -1,3 +1,9 @@
+
+import '../style.css'
+import '../HU27.css'
+import { renderStoryLinks } from '../story-navigation.js'
+import { renderStorySidebar } from '../story-sidebar.js'
+
 import {
   getNotifications,
   getPets,
@@ -8,6 +14,45 @@ import {
 } from '../workflows/HU27.js';
 
 const $ = (selector) => document.querySelector(selector);
+
+$('#primary-navigation').innerHTML = renderStoryLinks('HU27');
+
+$('#hu27-sidebar').innerHTML = renderStorySidebar({
+  sidebarLabel: 'Administración de notificaciones',
+  petStatus: 'En adopción',
+  petEmoji: '🐶',
+  petTitle: 'Información al día',
+  petTag: 'HU27',
+  petSubtitle: 'Gestión de avisos',
+  asideDescription: 'Consulta y administra los avisos relacionados con las mascotas y sus procesos de adopción.',
+  helpTitle: 'Gestiona tus avisos',
+  helpDescription: 'Puedes buscar, modificar o eliminar las notificaciones registradas.',
+  helpSteps: [
+    ['Filtra los resultados', 'Selecciona el canal, la mascota o el adoptante.'],
+    ['Edita una notificación', 'Actualiza su información y guarda los cambios.'],
+    ['Elimina si es necesario', 'Confirma la eliminación de los registros que ya no necesites.'],
+  ],
+  helpLink: {
+    href: './HU26.html',
+    label: 'Crear notificación',
+  },
+  asideNote: 'Mantener la información actualizada ayuda a organizar cada proceso.',
+});
+
+const menuToggle = $('.menu-toggle');
+
+menuToggle.addEventListener('click', () => {
+  const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+
+  menuToggle.setAttribute('aria-expanded', String(!expanded));
+  menuToggle.setAttribute(
+    'aria-label',
+    expanded ? 'Abrir navegación' : 'Cerrar navegación',
+  );
+
+  $('#primary-navigation').classList.toggle('nav-open', !expanded);
+});
+
 
 const listElement = $('#notifications-list');
 const feedbackElement = $('#feedback');

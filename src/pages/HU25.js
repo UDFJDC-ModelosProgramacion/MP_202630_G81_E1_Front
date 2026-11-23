@@ -1,7 +1,9 @@
 
 import '../style.css'
-import '../../HU25.css'
+import '../HU25.css'
 import { renderStoryLinks } from '../story-navigation.js'
+import { renderStorySidebar } from '../story-sidebar.js'
+
 
 import {
   ReviewsError,
@@ -19,7 +21,7 @@ import {
 const $ = (selector) => document.querySelector(selector)
 
 const elements = {
-  navigation: $('#story-navigation'),
+  navigation: $('#primary-navigation'),
   filters: $('#review-filters'),
   petId: $('#pet-id'),
   rating: $('#rating'),
@@ -37,7 +39,46 @@ const elements = {
 
 const apiUrl = getApiUrl(import.meta.env)
 
+
+
 elements.navigation.innerHTML = renderStoryLinks('HU25')
+
+document.querySelector('#hu25-sidebar').innerHTML = renderStorySidebar({
+  sidebarLabel: 'Información sobre reseñas',
+  petStatus: 'En adopción',
+  petEmoji: '🐕',
+  petTitle: 'Opiniones que ayudan',
+  petTag: 'HU25',
+  petSubtitle: 'Consulta de reseñas',
+  asideDescription: 'Las experiencias de nuestra comunidad ayudan a conocer mejor a las mascotas y sus historias.',
+  helpTitle: 'Encuentra una opinión',
+  helpDescription: 'Consulta las reseñas registradas y descubre las experiencias compartidas en Huellitas.',
+  helpSteps: [
+    ['Filtra las reseñas', 'Busca por mascota, adoptante o calificación.'],
+    ['Consulta los resultados', 'Revisa las opiniones y sus puntuaciones.'],
+    ['Busca por ID', 'Encuentra una reseña específica con su identificador.'],
+  ],
+  helpLink: {
+    href: './HU24.html',
+    label: 'Publicar una reseña',
+  },
+  asideNote: 'Cada experiencia compartida puede ayudar a otra familia.',
+})
+
+const menuToggle = document.querySelector('.menu-toggle')
+
+menuToggle.addEventListener('click', () => {
+  const expanded = menuToggle.getAttribute('aria-expanded') === 'true'
+
+  menuToggle.setAttribute('aria-expanded', String(!expanded))
+  menuToggle.setAttribute(
+    'aria-label',
+    expanded ? 'Abrir navegación' : 'Cerrar navegación',
+  )
+
+  elements.navigation.classList.toggle('nav-open', !expanded)
+})
+
 
 function showListState(state) {
   elements.loading.hidden = state !== 'loading'

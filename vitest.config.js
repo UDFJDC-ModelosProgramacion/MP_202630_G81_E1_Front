@@ -12,6 +12,7 @@ export default defineConfig({
         'src/workflows/story-api.js',
         'src/catalog/catalog.js',
         'src/api/client.js',
+        'src/api-client.js',
       ],
       reporter: ['text', 'html', 'lcov'],
       thresholds: {

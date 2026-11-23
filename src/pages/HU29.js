@@ -1,3 +1,9 @@
+
+import '../style.css';
+import '../HU29.css';
+import { renderStoryLinks } from '../story-navigation.js';
+import { renderStorySidebar } from '../story-sidebar.js';
+
 import {
   getPets,
   getMedicalEvents,
@@ -6,6 +12,45 @@ import {
 } from '../workflows/HU29.js';
 
 const $ = (selector) => document.querySelector(selector);
+
+$('#primary-navigation').innerHTML = renderStoryLinks('HU29');
+
+$('#hu29-sidebar').innerHTML = renderStorySidebar({
+  sidebarLabel: 'Historial médico de mascotas',
+  petStatus: 'En adopción',
+  petEmoji: '🐶',
+  petTitle: 'Su salud importa',
+  petTag: 'HU29',
+  petSubtitle: 'Seguimiento médico',
+  asideDescription: 'Consulta la información médica de cada mascota y revisa los eventos que se han registrado durante su cuidado.',
+  helpTitle: 'Consulta su historial',
+  helpDescription: 'Encuentra diagnósticos y tratamientos registrados para conocer mejor su estado de salud.',
+  helpSteps: [
+    ['Selecciona una mascota', 'Escoge la mascota cuyo historial quieres consultar.'],
+    ['Filtra los eventos', 'Busca un diagnóstico específico para encontrar los registros relacionados.'],
+    ['Consulta los detalles', 'Utiliza el ID de un evento para revisar su información completa.'],
+  ],
+  helpLink: {
+    href: './HU28.html',
+    label: 'Registrar evento médico',
+  },
+  asideNote: 'Un historial organizado facilita el seguimiento de la salud y el bienestar de las mascotas.',
+});
+
+const menuToggle = $('.menu-toggle');
+
+menuToggle.addEventListener('click', () => {
+  const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+
+  menuToggle.setAttribute('aria-expanded', String(!expanded));
+  menuToggle.setAttribute(
+    'aria-label',
+    expanded ? 'Abrir navegación' : 'Cerrar navegación',
+  );
+
+  $('#primary-navigation').classList.toggle('nav-open', !expanded);
+});
+
 
 const petSelect = $('#pet');
 const listElement = $('#events-list');

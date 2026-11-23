@@ -105,3 +105,5 @@ La lógica está en `src/workflows/HU30.js` (cobertura del 100 %), la interfaz e
 
 ## Video
 https://www.youtube.com/watch?v=lZHhNKTwbAk
+
+HU30-HU35 consumen el API del back-end (por defecto http://localhost:8999/api).
