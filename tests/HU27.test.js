@@ -515,3 +515,28 @@ describe('HU27 - cobertura adicional', () => {
     });
   });
 });
+describe('HU27 - Configuracion de la API', () => {
+  it('utiliza la URL predeterminada cuando no hay configuracion', async () => {
+    vi.stubEnv('VITE_API_URL', '');
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: async () => '[]',
+    });
+
+    vi.stubGlobal('fetch', mockFetch);
+
+    try {
+      expect(await getNotifications()).toEqual([]);
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        'http://localhost:8080/api/notificaciones',
+        expect.any(Object),
+      );
+    } finally {
+      vi.unstubAllEnvs();
+      vi.unstubAllGlobals();
+    }
+  });
+});
