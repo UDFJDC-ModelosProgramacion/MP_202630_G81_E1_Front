@@ -20,8 +20,19 @@ const stories = [
   ['HU19', 'Formalizar adopción'],
   ['HU20', 'Prueba de convivencia'],
   ['HU21', 'Devolución'],
+  ['HU23', 'Actualizaciones'],
+  ['HU24', 'Reseñas'],
+  ['HU25', 'Consultar reseñas'],
+  ['HU26', 'Generar notificaciones'],
+  ['HU27', 'Gestionar notificaciones'],
+  ['HU28', 'Eventos médicos'],
+  ['HU29', 'Historial médico'],
   ['HU30', 'Gestionar refugios'],
+  ['HU31', 'Detalle de un refugio'],
+  ['HU32', 'Registrar una mascota'],
   ['HU33', 'Catálogo de mascotas'],
+  ['HU34', 'Registrar veterinarios'],
+  ['HU35', 'Seguimientos veterinarios'],
 ]
 
 export function renderStoryLinks(activeStory) {

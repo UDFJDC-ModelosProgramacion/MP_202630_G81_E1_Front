@@ -2,7 +2,7 @@
 // HU25 - Consultar resenas de mascotas.
 // Logica independiente del DOM para facilitar las pruebas.
 
-export const DEFAULT_API_URL = 'http://localhost:8999/api'
+export const DEFAULT_API_URL = 'http://localhost:8999/api';
 
 export class ReviewsError extends Error {
   constructor(message, { status = null } = {}) {

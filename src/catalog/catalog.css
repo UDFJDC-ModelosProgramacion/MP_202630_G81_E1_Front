@@ -1,64 +1,79 @@
-@import "tailwindcss";
+/* Estilos de componentes del catálogo (HU33). También los cargan HU31 y HU34, que reutilizan
+   .pet-card, .detail-row y .catalog-message. Todo va acotado a .admin-main para no tocar el
+   panel lateral del shell, que también usa la clase .pet-card. Colores: variables de style.css. */
 
-:root {
-  --ink: #1c1917;
-  --muted: #44403c;
-  --accent: #c2410c;
-  --accent-strong: #9a3412;
-  --surface: #fffaf5;
-  --border: #d6d3d1;
+.admin-main .catalog-filters {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin-bottom: 4px;
 }
 
-body {
+.admin-main .results-summary { min-height: 18px; margin: 8px 0 14px; color: var(--muted); font-size: 12px; }
+
+.admin-main .pet-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   margin: 0;
-  background: var(--surface);
+  padding: 0;
+  list-style: none;
+}
+
+.admin-main .pet-card { padding: 18px; }
+.admin-main .pet-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.admin-main .pet-card-head h2,
+.admin-main .pet-card-head h3 { margin: 0; color: var(--ink); font-size: 18px; font-weight: 700; }
+.admin-main .pet-species { margin: 4px 0 0; color: var(--green); font-size: 12px; font-weight: 700; }
+.admin-main .pet-meta { margin: 8px 0 0; color: var(--ink); font-size: 12px; }
+.admin-main .pet-note { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+.admin-main .pet-place { margin: 12px 0 0; color: var(--muted); font-size: 12px; }
+.admin-main .card-link { margin-top: 14px; text-decoration: none; }
+.admin-main .pet-actions { margin: 14px 0 0; font-size: 12px; }
+.admin-main .pet-actions a, .admin-main .back-link { color: var(--green); font-weight: 700; }
+
+.admin-main .catalog-message {
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  background: var(--paper);
   color: var(--ink);
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.5;
+  font-size: 13px;
+  text-align: center;
 }
-
-.catalog-container { width: min(72rem, 100% - 2rem); margin-inline: auto; }
-.catalog-header { background: #fff; border-bottom: 1px solid var(--border); }
-.brand { font-weight: 800; font-size: 1.25rem; color: var(--accent-strong); text-decoration: none; }
-nav a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
-.story-navigation { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; }
-.story-navigation a[aria-current="page"] { color: var(--accent-strong); }
-.eyebrow { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; color: var(--accent-strong); }
-
-.field { display: flex; flex-direction: column; gap: 0.25rem; }
-.field label { font-size: 0.875rem; font-weight: 600; }
-.field input, .field select {
-  border: 1px solid #78716c; border-radius: 0.75rem; background: #fff; padding: 0.6rem 0.8rem; font: inherit; color: var(--ink);
-}
-
-:where(a, button, input, select):focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
-
-.btn {
-  border: 0; border-radius: 999px; background: var(--accent-strong); color: #fff;
-  padding: 0.6rem 1.2rem; font-weight: 700; cursor: pointer;
-}
-.btn:hover { background: #7c2d12; }
-.btn-secondary { background: #fff; color: var(--accent-strong); border: 2px solid var(--accent-strong); }
-.btn-secondary:hover { background: #ffedd5; }
-
-.catalog-message { margin-top: 1.5rem; padding: 1.5rem; border: 1px dashed #78716c; border-radius: 1rem; background: #fff; text-align: center; }
-.catalog-error { border-style: solid; border-color: #b91c1c; color: #7f1d1d; background: #fef2f2; }
-.catalog-error .btn { margin-top: 0.75rem; }
-.catalog-message[hidden], [hidden] { display: none !important; }
+.admin-main .catalog-error { border-style: solid; border-color: #e3b5ad; background: #fff5f1; color: #a64e43; }
+.admin-main .catalog-message p { margin: 0 0 10px; }
+.admin-main .catalog-message button { max-width: 220px; margin-inline: auto; }
 
 .spinner {
-  display: inline-block; width: 1rem; height: 1rem; margin-right: 0.5rem; vertical-align: -0.15rem;
-  border: 3px solid #d6d3d1; border-top-color: var(--accent-strong); border-radius: 50%; animation: spin 0.8s linear infinite;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  border: 3px solid var(--line);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: catalog-spin 0.8s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes catalog-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
 
-.status-badge { background: #e7e5e4; color: #1c1917; }
-.status-badge[data-status="Disponible"] { background: #dcfce7; color: #14532d; }
-.status-badge[data-status="En proceso de adopcion"] { background: #fef3c7; color: #78350f; }
-.status-badge[data-status="Adoptado"] { background: #e0e7ff; color: #312e81; }
+.admin-main .status-badge {
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 3px 10px;
+  background: #ecebe4;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+}
+.admin-main .status-badge[data-status="Disponible"] { background: var(--green-pale); color: var(--green-dark); }
+.admin-main .status-badge[data-status="En proceso de adopcion"] { background: #fdf0e3; color: #9a5a22; }
+.admin-main .status-badge[data-status="Adoptado"] { background: #e8ecf8; color: #34457a; }
 
-.detail-row { display: flex; flex-direction: column; }
-.detail-row dt { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-.detail-row dd { margin: 0; font-size: 1rem; color: var(--ink); }
-.back-link { color: var(--accent-strong); font-weight: 600; }
+.admin-main .detail-list { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin: 14px 0 0; }
+.admin-main .detail-row { display: flex; flex-direction: column; gap: 2px; }
+.admin-main .detail-row dt { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.admin-main .detail-row dd { margin: 0; color: var(--ink); font-size: 13px; }

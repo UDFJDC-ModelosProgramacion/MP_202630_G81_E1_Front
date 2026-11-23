@@ -24,6 +24,8 @@ const values = {
   descripcion: 'Refugio de perros y gatos',
 }
 
+const toApi = ({ correo, ...rest }) => ({ ...rest, email: correo })
+
 function response(body, { ok = true, status = 200 } = {}) {
   return { ok, status, json: async () => body }
 }
@@ -133,7 +135,7 @@ describe('HU30 createShelter', () => {
     expect(url).toBe(`${API}/refugios`)
     expect(options.method).toBe('POST')
     expect(options.headers['Content-Type']).toBe('application/json')
-    expect(JSON.parse(options.body)).toEqual(values)
+    expect(JSON.parse(options.body)).toEqual(toApi(values))
     expect(saved.id).toBe(9)
   })
 
@@ -141,6 +143,11 @@ describe('HU30 createShelter', () => {
     const fetchFn = vi.fn().mockResolvedValue(response(values))
     await createShelter(fetchFn, values)
     expect(fetchFn.mock.calls[0][0]).toBe(`${DEFAULT_API_URL}/refugios`)
+  })
+
+  it('reads the email sent by the API as `email`', () => {
+    const { correo, ...rest } = values
+    expect(normalizeShelter({ ...rest, email: correo }).correo).toBe(correo)
   })
 
   it('accepts a successful reply without a body', async () => {
@@ -189,7 +196,7 @@ describe('HU30 updateShelter', () => {
     const [url, options] = fetchFn.mock.calls[0]
     expect(url).toBe(`${API}/refugios/5`)
     expect(options.method).toBe('PUT')
-    expect(JSON.parse(options.body)).toEqual(values)
+    expect(JSON.parse(options.body)).toEqual(toApi(values))
     expect(saved.id).toBe(5)
   })
 

@@ -16,6 +16,9 @@ const json = (status: number, body: unknown) => ({
   body: JSON.stringify(body),
 })
 
+// The API names the e-mail `email`; the form calls it `correo`.
+const toApi = ({ correo, ...rest }: Record<string, string>) => ({ ...rest, email: correo })
+
 async function fillForm(page: Page, values: Record<string, string>) {
   await page.getByLabel('Nombre').fill(values.nombre)
   await page.getByLabel('Ciudad').fill(values.ciudad)
@@ -29,7 +32,7 @@ test('registers a shelter and offers a link to edit it', async ({ page }) => {
   let sent: unknown = null
   await page.route(/\/api\/refugios$/, (route) => {
     sent = route.request().postDataJSON()
-    return route.fulfill(json(201, { id: 12, ...datos }))
+    return route.fulfill(json(201, { id: 12, ...toApi(datos) }))
   })
   await page.goto('/HU30.html')
   await expect(page.getByRole('heading', { name: 'Gestionar refugios', level: 1 })).toBeVisible()
@@ -39,7 +42,7 @@ test('registers a shelter and offers a link to edit it', async ({ page }) => {
 
   await expect(page.getByText('Refugio registrado correctamente.')).toBeVisible()
   await expect(page.getByRole('link', { name: 'Editar este refugio' })).toHaveAttribute('href', './HU30.html?id=12')
-  expect(sent).toEqual(datos)
+  expect(sent).toEqual(toApi(datos))
   await expect(page.getByLabel('Nombre')).toHaveValue('')
 })
 
@@ -69,9 +72,9 @@ test('rejects an invalid email', async ({ page }) => {
 test('loads an existing shelter and saves the changes', async ({ page }) => {
   let sent: unknown = null
   await page.route(/\/api\/refugios\/5$/, (route) => {
-    if (route.request().method() === 'GET') return route.fulfill(json(200, { id: 5, ...datos }))
+    if (route.request().method() === 'GET') return route.fulfill(json(200, { id: 5, ...toApi(datos) }))
     sent = route.request().postDataJSON()
-    return route.fulfill(json(200, { id: 5, ...datos, ciudad: 'Cali' }))
+    return route.fulfill(json(200, { id: 5, ...toApi(datos), ciudad: 'Cali' }))
   })
   await page.goto('/HU30.html?id=5')
 
@@ -81,7 +84,7 @@ test('loads an existing shelter and saves the changes', async ({ page }) => {
   await page.getByRole('button', { name: /Guardar refugio/ }).click()
 
   await expect(page.getByText('Refugio actualizado correctamente.')).toBeVisible()
-  expect(sent).toEqual({ ...datos, ciudad: 'Cali' })
+  expect(sent).toEqual(toApi({ ...datos, ciudad: 'Cali' }))
   await expect(page.getByLabel('Ciudad')).toHaveValue('Cali')
 })
 
@@ -102,7 +105,7 @@ test('shows a not found error when the id in the address is invalid', async ({ p
 test('shows a not found error when the shelter disappears before saving', async ({ page }) => {
   await page.route(/\/api\/refugios\/5$/, (route) =>
     route.request().method() === 'GET'
-      ? route.fulfill(json(200, { id: 5, ...datos }))
+      ? route.fulfill(json(200, { id: 5, ...toApi(datos) }))
       : route.fulfill(json(404, {})))
   await page.goto('/HU30.html?id=5')
   await expect(page.getByLabel('Nombre')).toHaveValue('Huellitas')
@@ -126,7 +129,7 @@ test('shows an error and lets the user retry loading', async ({ page }) => {
   let calls = 0
   await page.route(/\/api\/refugios\/5$/, (route) => {
     calls += 1
-    return calls === 1 ? route.fulfill(json(500, {})) : route.fulfill(json(200, { id: 5, ...datos }))
+    return calls === 1 ? route.fulfill(json(500, {})) : route.fulfill(json(200, { id: 5, ...toApi(datos) }))
   })
   await page.goto('/HU30.html?id=5')
 
@@ -169,7 +172,7 @@ test('can be completed with the keyboard only', async ({ page }) => {
 })
 
 test('opens the shelter to edit from its number', async ({ page }) => {
-  await page.route(/\/api\/refugios\/5$/, (route) => route.fulfill(json(200, { id: 5, ...datos })))
+  await page.route(/\/api\/refugios\/5$/, (route) => route.fulfill(json(200, { id: 5, ...toApi(datos) })))
   await page.goto('/HU30.html')
 
   await page.getByLabel('Número de refugio').fill('5')

@@ -1,120 +1,245 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HU27 - Gestionar notificaciones</title>
-  <link rel="stylesheet" href="./HU27.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Consulta, filtra y administra las notificaciones de Huellitas."
+  />
+  <title>HU27 · Gestionar notificaciones | Huellitas</title>
 </head>
+
 <body>
-  <main class="container">
-    <header class="header">
-      <h1>Gestionar notificaciones registradas</h1>
-      <p>Consulta, filtra, edita o elimina notificaciones del sistema.</p>
-    </header>
+  <header class="site-header mx-auto flex items-center justify-between">
+    <a class="brand" href="./HU01.html" aria-label="Huellitas, inicio">
+      <span class="brand-mark" aria-hidden="true">🐾</span>
+      <span>huellitas<span class="brand-dot">.</span></span>
+    </a>
 
-    <section class="panel">
-      <h2>Filtros</h2>
+    <nav
+      class="header-nav"
+      id="primary-navigation"
+      aria-label="Navegación principal"
+    ></nav>
 
-      <div class="filters">
-        <label>
-          Canal
-          <select id="filter-channel">
-            <option value="">Todos los canales</option>
-            <option value="EMAIL">EMAIL</option>
-            <option value="SMS">SMS</option>
-            <option value="PUSH">PUSH</option>
-          </select>
-        </label>
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-label="Abrir navegación"
+      aria-controls="primary-navigation"
+      aria-expanded="false"
+    >
+      <span></span>
+      <span></span>
+    </button>
+  </header>
 
-        <label>
-          Mascota
-          <select id="filter-pet">
-            <option value="">Todas las mascotas</option>
-          </select>
-        </label>
+  <main class="mx-auto w-full hu27-main">
+    <div class="story-layout">
+      <div class="story-primary">
 
-        <label>
-          Adoptante
-          <select id="filter-adopter">
-            <option value="">Todos los adoptantes</option>
-          </select>
-        </label>
+        <header class="hu27-intro">
+          <p class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            HUELLITAS · ADMINISTRACIÓN
+          </p>
 
-        <button id="filter-button" type="button">Filtrar</button>
-        <button id="clear-filters" type="button" class="secondary">Limpiar</button>
+          <h1>Gestionar notificaciones</h1>
+
+          <p>
+            Consulta, filtra, edita o elimina las notificaciones
+            registradas en el sistema.
+          </p>
+        </header>
+
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
+          <a href="./HU01.html">Huellitas</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">HU27 · Gestionar notificaciones</span>
+        </nav>
+
+        <section class="hu27-panel" aria-labelledby="hu27-filters-title">
+          <div class="hu27-section-heading">
+            <p class="hu27-eyebrow">BUSCAR NOTIFICACIONES</p>
+            <h2 id="hu27-filters-title">Filtros de búsqueda</h2>
+            <p>
+              Encuentra notificaciones según el canal, la mascota
+              o el adoptante asociado.
+            </p>
+          </div>
+
+          <div class="filters">
+            <label>
+              Canal
+              <select id="filter-channel">
+                <option value="">Todos los canales</option>
+                <option value="EMAIL">EMAIL</option>
+                <option value="SMS">SMS</option>
+                <option value="PUSH">PUSH</option>
+              </select>
+            </label>
+
+            <label>
+              Mascota
+              <select id="filter-pet">
+                <option value="">Todas las mascotas</option>
+              </select>
+            </label>
+
+            <label>
+              Adoptante
+              <select id="filter-adopter">
+                <option value="">Todos los adoptantes</option>
+              </select>
+            </label>
+
+            <div class="hu27-filter-actions">
+              <button id="filter-button" type="button">
+                Filtrar
+              </button>
+
+              <button
+                id="clear-filters"
+                type="button"
+                class="secondary"
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="hu27-panel" aria-labelledby="hu27-list-title">
+          <div class="section-heading">
+            <div class="hu27-section-heading">
+              <p class="hu27-eyebrow">HISTORIAL DEL SISTEMA</p>
+              <h2 id="hu27-list-title">Notificaciones registradas</h2>
+            </div>
+
+            <button
+              id="reload-button"
+              type="button"
+              class="secondary"
+            >
+              Actualizar
+            </button>
+          </div>
+
+          <p id="feedback" role="status" aria-live="polite"></p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tipo</th>
+                  <th>Mensaje</th>
+                  <th>Fecha</th>
+                  <th>Canal</th>
+                  <th>Mascota</th>
+                  <th>Adoptante</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+
+              <tbody id="notifications-list">
+                <tr>
+                  <td colspan="8">Cargando notificaciones...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section
+          class="hu27-panel"
+          id="edit-panel"
+          aria-labelledby="hu27-edit-title"
+          hidden
+        >
+          <div class="hu27-section-heading">
+            <p class="hu27-eyebrow">ACTUALIZAR INFORMACIÓN</p>
+            <h2 id="hu27-edit-title">Editar notificación</h2>
+            <p>
+              Modifica los datos y guarda los cambios
+              para actualizar la notificación.
+            </p>
+          </div>
+
+          <form id="edit-form">
+            <input type="hidden" id="edit-id" />
+
+            <label>
+              Tipo
+              <input
+                id="edit-type"
+                type="text"
+                required
+                maxlength="100"
+              />
+            </label>
+
+            <label>
+              Mensaje
+              <textarea
+                id="edit-message"
+                required
+                maxlength="1000"
+              ></textarea>
+            </label>
+
+            <label>
+              Fecha
+              <input
+                id="edit-date"
+                type="date"
+                required
+              />
+            </label>
+
+            <label>
+              Canal
+              <select id="edit-channel" required>
+                <option value="">Seleccione un canal</option>
+                <option value="EMAIL">EMAIL</option>
+                <option value="SMS">SMS</option>
+                <option value="PUSH">PUSH</option>
+              </select>
+            </label>
+
+            <div class="form-actions">
+              <button type="submit">
+                Guardar cambios
+              </button>
+
+              <button
+                id="cancel-edit"
+                type="button"
+                class="secondary"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </section>
+
       </div>
-    </section>
 
-    <section class="panel">
-      <div class="section-heading">
-        <h2>Notificaciones registradas</h2>
-        <button id="reload-button" type="button" class="secondary">Actualizar</button>
-      </div>
-
-      <p id="feedback" role="status" aria-live="polite"></p>
-
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Tipo</th>
-              <th>Mensaje</th>
-              <th>Fecha</th>
-              <th>Canal</th>
-              <th>Mascota</th>
-              <th>Adoptante</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="notifications-list">
-            <tr>
-              <td colspan="8">Cargando notificaciones...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="panel" id="edit-panel" hidden>
-      <h2>Editar notificación</h2>
-
-      <form id="edit-form">
-        <input type="hidden" id="edit-id">
-
-        <label>
-          Tipo
-          <input id="edit-type" type="text" required maxlength="100">
-        </label>
-
-        <label>
-          Mensaje
-          <textarea id="edit-message" required maxlength="1000"></textarea>
-        </label>
-
-        <label>
-          Fecha
-          <input id="edit-date" type="date" required>
-        </label>
-
-        <label>
-          Canal
-          <select id="edit-channel" required>
-            <option value="">Seleccione un canal</option>
-            <option value="EMAIL">EMAIL</option>
-            <option value="SMS">SMS</option>
-            <option value="PUSH">PUSH</option>
-          </select>
-        </label>
-
-        <div class="form-actions">
-          <button type="submit">Guardar cambios</button>
-          <button id="cancel-edit" type="button" class="secondary">Cancelar</button>
-        </div>
-      </form>
-    </section>
+      <div id="hu27-sidebar"></div>
+    </div>
   </main>
+
+  <footer class="site-footer mx-auto flex items-center justify-between">
+    <a class="brand footer-brand" href="./HU01.html">
+      <span class="brand-mark" aria-hidden="true">🐾</span>
+      <span>huellitas<span class="brand-dot">.</span></span>
+    </a>
+
+    <p>Con amor, cada historia encuentra su hogar.</p>
+    <span>© 2026 Huellitas</span>
+  </footer>
 
   <script type="module" src="./src/pages/HU27.js"></script>
 </body>
